@@ -11,7 +11,7 @@ services:
       sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.15
+        value: 3.12.8
       - key: ENVIRONMENT
         value: production
       - key: PERSISTENT_DATA_PATH
@@ -19,5 +19,5 @@ services:
       - key: ALLOW_VERCEL_PREVIEWS
         value: "true"
       - key: ALLOWED_ORIGINS
-        value: "http://localhost:5173,https://land-guard-ai.vercel.app,https://landguard-ai.vercel.app"
+        value: "http://localhost:5173,http://127.0.0.1:5173,https://land-guard-ai.vercel.app,https://landguard-ai.vercel.app"
     healthCheckPath: /health

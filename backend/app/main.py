@@ -42,7 +42,7 @@ class Settings:
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     ALLOWED_ORIGINS: str = os.getenv(
         "ALLOWED_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173,https://landguard-ai.vercel.app"
+        "http://localhost:5173,http://127.0.0.1:5173,https://land-guard-ai.vercel.app,https://landguard-ai.vercel.app"
     )
     ALLOW_VERCEL_PREVIEWS: bool = os.getenv("ALLOW_VERCEL_PREVIEWS", "true").lower() in ("true", "1", "yes")
     DEFAULT_ASSESSMENT_DATE: date = date.fromisoformat(

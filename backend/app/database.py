@@ -207,46 +207,85 @@ def init_db():
 
     # 5. User Provisioning (Environment Secrets & Production Security)
     now = datetime.now(timezone.utc).isoformat()
-    environment = os.getenv("ENVIRONMENT", "development").strip().lower()
+    is_production = (
+        os.getenv("RENDER") == "true"
+        or os.getenv("ENVIRONMENT", "").strip().lower() in ("production", "prod")
+    )
 
     admin_user = os.getenv("ADMIN_USERNAME", "admin").strip()
     admin_pass = os.getenv("ADMIN_PASSWORD")
     reviewer_user = os.getenv("REVIEWER_USERNAME", "reviewer").strip()
     reviewer_pass = os.getenv("REVIEWER_PASSWORD")
 
-    # Secure provisioning via environment variables
-    if admin_pass:
-        h_adm, _ = hash_password(admin_pass)
-        cursor.execute(
-            """INSERT INTO users (username, hashed_password, salt, role, created_at)
-               VALUES (?, ?, ?, 'admin', ?)
-               ON CONFLICT(username) DO UPDATE SET hashed_password = excluded.hashed_password""",
-            (admin_user, h_adm, "", now)
-        )
-        logger.info(f"Provisioned administrator account '{admin_user}' via environment secret.")
+    if is_production:
+        # Production Mode:
+        # 1. Purge all demonstration credentials and their active sessions
+        known_demo_passwords = ["ReviewerPass2026!", "AdminPass2026!", "reviewer123", "admin123"]
+        cursor.execute("SELECT username, hashed_password, salt FROM users")
+        existing_users = cursor.fetchall()
+        for u in existing_users:
+            uname = u["username"]
+            hpass = u["hashed_password"]
+            usalt = u.get("salt", "")
+            is_demo_pass = any(verify_password(p, hpass, usalt) for p in known_demo_passwords)
+            if is_demo_pass or (uname in ("reviewer", "admin") and not (
+                (uname == admin_user and admin_pass) or (uname == reviewer_user and reviewer_pass)
+            )):
+                cursor.execute("DELETE FROM sessions WHERE username = ?", (uname,))
+                cursor.execute("DELETE FROM users WHERE username = ?", (uname,))
+                logger.warning(f"Production Security: Revoked exposed demonstration account '{uname}'.")
 
-    if reviewer_pass:
-        h_rev, _ = hash_password(reviewer_pass)
-        cursor.execute(
-            """INSERT INTO users (username, hashed_password, salt, role, created_at)
-               VALUES (?, ?, ?, 'reviewer', ?)
-               ON CONFLICT(username) DO UPDATE SET hashed_password = excluded.hashed_password""",
-            (reviewer_user, h_rev, "", now)
-        )
-        logger.info(f"Provisioned reviewer account '{reviewer_user}' via environment secret.")
+        # 2. Provision secure administrator if configured via environment variables
+        if admin_pass:
+            h_adm, _ = hash_password(admin_pass)
+            cursor.execute(
+                """INSERT INTO users (username, hashed_password, salt, role, created_at)
+                   VALUES (?, ?, ?, 'admin', ?)
+                   ON CONFLICT(username) DO UPDATE SET hashed_password = excluded.hashed_password""",
+                (admin_user, h_adm, "", now)
+            )
+            logger.info(f"Production Security: Provisioned administrator account '{admin_user}' via environment secret.")
 
-    cursor.execute("SELECT COUNT(*) FROM users")
-    count_row = cursor.fetchone()
-    user_count = count_row["COUNT(*)"] if isinstance(count_row, dict) and "COUNT(*)" in count_row else (list(count_row.values())[0] if isinstance(count_row, dict) else count_row[0])
+        if reviewer_pass:
+            h_rev, _ = hash_password(reviewer_pass)
+            cursor.execute(
+                """INSERT INTO users (username, hashed_password, salt, role, created_at)
+                   VALUES (?, ?, ?, 'reviewer', ?)
+                   ON CONFLICT(username) DO UPDATE SET hashed_password = excluded.hashed_password""",
+                (reviewer_user, h_rev, "", now)
+            )
+            logger.info(f"Production Security: Provisioned reviewer account '{reviewer_user}' via environment secret.")
 
-    if environment == "production":
-        if user_count == 0 and not admin_pass:
+        cursor.execute("SELECT COUNT(*) FROM users")
+        count_row = cursor.fetchone()
+        user_count = count_row["COUNT(*)"] if isinstance(count_row, dict) and "COUNT(*)" in count_row else (list(count_row.values())[0] if isinstance(count_row, dict) else count_row[0])
+        if user_count == 0:
             logger.warning(
-                "PRODUCTION SECURITY NOTICE: Default accounts are disabled in production. "
-                "Configure ADMIN_PASSWORD and REVIEWER_PASSWORD in your hosting environment variables."
+                "PRODUCTION SECURITY NOTICE: Automatic demo accounts are disabled in production. "
+                "Supply ADMIN_PASSWORD and/or REVIEWER_PASSWORD in your hosting environment variables."
             )
     else:
         # Development / Testing environments: Seed demonstration accounts if no users exist
+        if admin_pass:
+            h_adm, _ = hash_password(admin_pass)
+            cursor.execute(
+                """INSERT INTO users (username, hashed_password, salt, role, created_at)
+                   VALUES (?, ?, ?, 'admin', ?)
+                   ON CONFLICT(username) DO UPDATE SET hashed_password = excluded.hashed_password""",
+                (admin_user, h_adm, "", now)
+            )
+        if reviewer_pass:
+            h_rev, _ = hash_password(reviewer_pass)
+            cursor.execute(
+                """INSERT INTO users (username, hashed_password, salt, role, created_at)
+                   VALUES (?, ?, ?, 'reviewer', ?)
+                   ON CONFLICT(username) DO UPDATE SET hashed_password = excluded.hashed_password""",
+                (reviewer_user, h_rev, "", now)
+            )
+
+        cursor.execute("SELECT COUNT(*) FROM users")
+        count_row = cursor.fetchone()
+        user_count = count_row["COUNT(*)"] if isinstance(count_row, dict) and "COUNT(*)" in count_row else (list(count_row.values())[0] if isinstance(count_row, dict) else count_row[0])
         if user_count == 0:
             h_rev, _ = hash_password("ReviewerPass2026!")
             cursor.execute(
