@@ -200,6 +200,14 @@ pytest -v           # 19 automated tests
 | `GET` | `/transactions/{id}` | Detailed conveyance attributes and synthetic indicators. |
 | `GET` | `/parcels/{id}/history` | Cadastral plot attributes and chronological deed sequence. |
 | `GET` | `/assess/{id}` | Explainable dual-model audit and evidence discrepancy findings. |
+| `POST` | `/api/auth/login` | Reviewer and administrator session authentication. |
+| `POST` | `/api/auth/logout` | Session invalidation and secure logout. |
+| `GET` | `/api/auth/me` | Current caller identity and role profile (viewer/reviewer/admin). |
+| `GET` | `/api/reviews` | Persistent review cases with status/scenario filtering and search. |
+| `GET` | `/api/reviews/{id}` | Case review details with linked deed record and audit history. |
+| `PATCH` | `/api/reviews/{id}` | Role-protected case resolution mutation and audit logging. |
+| `GET` | `/api/reviews/{id}/history` | Immutable chronological audit timeline for a review case. |
+| `GET` | `/api/reports/assessment/{id}` | Real downloadable ReportLab binary PDF assessment report. |
 
 ---
 
@@ -212,6 +220,19 @@ The repository is configured with automated continuous delivery:
 
 ---
 
-## 10. License
+## 10. Technical Reports & Architecture Documentation
+
+Detailed documentation is available in the [`docs/`](docs/) directory:
+- [Stage 4 Advanced Integration Report](docs/STAGE_4_ADVANCED_INTEGRATION_REPORT.md)
+- [Stage 5 Deployment Report](docs/STAGE_5_DEPLOYMENT_REPORT.md)
+- [Render Configuration Guide](docs/RENDER_CONFIGURATION.md)
+- [Vercel Configuration Guide](docs/VERCEL_CONFIGURATION.md)
+- [CI/CD Configuration Guide](docs/CI_CD_CONFIGURATION.md)
+- [Production Test Report](docs/PRODUCTION_TEST_REPORT.md)
+- [Future Update Workflow](docs/FUTURE_UPDATE_WORKFLOW.md)
+
+---
+
+## 11. License
 
 This project is developed for educational, demonstration, and research purposes under the [MIT License](LICENSE).

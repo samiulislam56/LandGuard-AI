@@ -1,59 +1,79 @@
-# LANDGUARD ATLAS — FUTURE UPDATE & CONTINUOUS MAINTENANCE WORKFLOW
-
-**Document Version:** 1.0.0  
+# LandGuard AI — Future Update & Continuous Delivery Workflow
+**Document Version:** 1.0  
 **Date:** October 16, 2026  
-**Audience:** Antigravity AI Engineering Sessions & Engineering Maintainers  
 
 ---
 
-## 1. Golden Rules for Future Antigravity Sessions
+## 1. Overview
 
-Whenever the user requests a new feature, bug fix, or design adjustment in Antigravity:
-1. **Single Source of Truth:** Repository `https://github.com/samiulislam56/LandGuard-AI` on branch `main` is the canonical codebase.
-2. **Never Force-Push:** Never execute `git push --force` or destructive history re-writes.
-3. **No Uncontrolled Automation:** Never start background processes that commit or push arbitrary unverified changes. All Git commits and pushes must occur only upon explicit user request or authorization after verified quality gates pass.
-4. **Machine Learning & Data Protection:**
-   - Never retrain or overwrite the trained model bundles (`rf_model` or `iso_forest`) without explicit authorization.
-   - Never modify or overwrite baseline synthetic CSV datasets in `backend/data/`.
-   - Never alter the 6-tier deterministic assessment policy precedence.
+This document specifies the standard operating procedure for implementing future features, bug fixes, or enhancements to **LandGuard AI** using Antigravity pair programming and automated continuous deployment.
 
 ---
 
-## 2. Standard Edit → Test → Commit → Push → Verify Workflow
-
-Follow this step-by-step lifecycle for every update:
+## 2. Seven-Step Continuous Update Cycle
 
 ```
-[1. Pull Latest]      git pull origin main
-       │
-[2. Implement Code]   Modify components, styles, or endpoints
-       │
-[3. Run Typecheck]    cd frontend && npm run typecheck
-       │
-[4. Run Lint]         npm run lint
-       │
-[5. Run Build]        npm run build
-       │
-[6. Run Backend CI]   cd backend && pytest -v
-       │
-[7. Stage & Commit]   git add <modified files>
-                      git commit -m "feat/fix: descriptive message"
-       │
-[8. Push to GitHub]   git push origin main
-       │
-[9. Verify Deployment]Monitor GitHub Actions -> Check Vercel & Render builds
+Step 1: User Request & Specification
+        │
+        ▼
+Step 2: Codebase Inspection & Impact Audit
+        │
+        ▼
+Step 3: Implementation & Preservation Check
+        │
+        ▼
+Step 4: Local Regression & Quality Testing (Pytest, Typecheck, Lint, Build)
+        │
+        ▼
+Step 5: Git Commit & Push to main
+        │
+        ▼
+Step 6: Automated CI & Cloud Redeployment (Render & Vercel)
+        │
+        ▼
+Step 7: Production Verification & Smoke Test
 ```
 
----
+### Step 1: User Request
+- The user issues a specific feature request or bug report to Antigravity.
 
-## 3. Rollback & Fault Recovery Protocol
+### Step 2: Codebase Inspection
+- Inspect existing route contracts, Pydantic schemas, and frontend hooks before making modifications.
+- Confirm ML model binaries and source CSV datasets remain unmodified and protected.
 
-If a production deployment encounters an issue:
-1. **Preserve Current State:** Do not attempt force-pushing old commits over `main`.
-2. **Revertvia Git Revert:**
+### Step 3: Implementation
+- Implement changes using clean, typed code adhering to the Atlas Studio design system and FastAPI standards.
+
+### Step 4: Local Quality Gates (Mandatory before Git Commit)
+1. Backend Tests:
    ```bash
-   git revert <failing_commit_sha> -m 1
-   git push origin main
+   cd backend && pytest -v
    ```
-   This creates a clean, forward-tracking reversal commit that triggers automatic re-deployment to the previous known-good state on both Vercel and Render.
-3. **Provider Rollback Buttons:** Both Vercel and Render dashboards provide an instant **"Rollback to Previous Deployment"** button that re-routes live CDN traffic to the prior release in < 15 seconds.
+2. Frontend Typecheck:
+   ```bash
+   cd frontend && npm run typecheck
+   ```
+3. Frontend Lint:
+   ```bash
+   cd frontend && npm run lint
+   ```
+4. Frontend Production Build:
+   ```bash
+   cd frontend && npm run build
+   ```
+
+### Step 5: Meaningful Git Commit & Push
+- Stage the verified changes:
+  ```bash
+  git add <modified_files>
+  git commit -m "feat(scope): concise description of verified change"
+  git push origin main
+  ```
+
+### Step 6: Automated Cloud Pipeline
+- GitHub Actions automatically runs the Ubuntu CI workflow ([Runs](https://github.com/samiulislam56/LandGuard-AI/actions)).
+- Render auto-detects `main` branch updates and redeploys the FastAPI container.
+- Vercel auto-detects `main` branch updates and builds the new frontend static bundle.
+
+### Step 7: Live Smoke Testing
+- Verify that live Render endpoints and live Vercel pages are operational.

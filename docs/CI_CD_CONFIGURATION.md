@@ -1,129 +1,63 @@
-# LANDGUARD ATLAS — CONTINUOUS INTEGRATION & CONTINUOUS DEPLOYMENT (CI/CD)
-
-**Document Version:** 1.0.0  
+# LandGuard AI — Continuous Integration & Continuous Deployment (CI/CD)
+**Document Version:** 1.0  
 **Date:** October 16, 2026  
-**Pipeline:** GitHub Actions (`.github/workflows/ci.yml`) + Vercel + Render  
-**Target Repository:** `https://github.com/samiulislam56/LandGuard-AI`  
+**Repository:** [https://github.com/samiulislam56/LandGuard-AI](https://github.com/samiulislam56/LandGuard-AI)  
 
 ---
 
-## 1. CI/CD Architecture Overview
+## 1. Architecture Overview
 
-The LandGuard Atlas platform is configured with an automated multi-stage continuous delivery pipeline:
+The LandGuard AI CI/CD pipeline ensures automated code quality checks, test verification, and automated continuous deployment:
 
 ```
-                  ┌──────────────────────────────────────────────┐
-                  │                 Developer Push               │
-                  │             git push origin main             │
-                  └──────────────────────┬───────────────────────┘
-                                         │
-                                         ▼
-                  ┌──────────────────────────────────────────────┐
-                  │              GitHub Actions CI               │
-                  │   ┌──────────────────┐ ┌──────────────────┐  │
-                  │   │ Frontend Quality │ │ Backend Quality  │  │
-                  │   │ • npm ci         │ │ • pip install    │  │
-                  │   │ • typecheck      │ │ • pytest -v      │  │
-                  │   │ • eslint         │ │ • 19 tests pass  │  │
-                  │   │ • vite build     │ │                  │  │
-                  │   └──────────────────┘ └──────────────────┘  │
-                  └──────────────────────┬───────────────────────┘
-                                         │ (On Pass)
-                         ┌───────────────┴───────────────┐
-                         ▼                               ▼
-        ┌────────────────────────────────┐ ┌────────────────────────────────┐
-        │        Vercel Webhook          │ │         Render Webhook         │
-        │ • Root: frontend               │ │ • Root: backend                │
-        │ • Build: npm run build         │ │ • Build: pip install -r reqs   │
-        │ • Output: dist                 │ │ • Run: uvicorn app.main:app    │
-        │ • Deploy: Production Edge CDN  │ │ • Health: /health              │
-        └────────────────────────────────┘ └────────────────────────────────┘
+Developer Workstation (Antigravity IDE)
+       │
+       ▼  git push origin main
+GitHub Repository (samiulislam56/LandGuard-AI)
+       │
+       ├──► GitHub Actions CI (.github/workflows/ci.yml)
+       │       ├── Job 1: Frontend Quality (npm ci, tsc, eslint, vite build)
+       │       └── Job 2: Backend Quality (python 3.12, pip, pytest -v [25 tests])
+       │
+       ├──► Render Auto-Deploy (Web Service: landguard-ai-backend)
+       │       └── Detects changes in backend/ & render.yaml &rarr; Redeploys FastAPI
+       │
+       └──► Vercel Auto-Deploy (Project: land-guard-ai)
+               └── Detects changes in frontend/ & vercel.json &rarr; Rebuilds with VITE_API_URL
 ```
 
 ---
 
-## 2. GitHub Actions Workflow (`ci.yml`)
+## 2. GitHub Actions Quality Gates
 
-Located at `.github/workflows/ci.yml`:
+Configured in `.github/workflows/ci.yml`:
 
-```yaml
-name: LandGuard AI — Continuous Integration
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  frontend-quality:
-    name: Frontend Quality Verification
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: TypeScript Typecheck
-        run: npm run typecheck
-
-      - name: ESLint Code Quality
-        run: npm run lint
-
-      - name: Production Bundle Build
-        run: npm run build
-
-  backend-quality:
-    name: Backend Quality Verification
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-          cache-dependency-path: backend/requirements.txt
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run Pytest Test Suite
-        run: pytest -v
-```
+- **Triggers:** Push and Pull Request to `main`.
+- **Frontend Job:**
+  - Node.js 20 environment on `ubuntu-latest`.
+  - Runs `npm ci`.
+  - Runs `npm run typecheck` (`tsc --noEmit`).
+  - Runs `npm run lint` (`eslint src`).
+  - Runs `npm run build` (`vite build`).
+- **Backend Job:**
+  - Python 3.12 environment on `ubuntu-latest`.
+  - Installs backend dependencies from `backend/requirements.txt`.
+  - Runs `pytest -v` across all 25 automated unit, regression, model-loading, auth, review persistence, and PDF generation tests.
 
 ---
 
-## 3. Automatic Deployments Configuration
+## 3. Verified CI Run History
 
-1. **Vercel GitHub Integration:**
-   - In Vercel, connect repository `samiulislam56/LandGuard-AI`.
-   - Set Root Directory to `frontend`.
-   - Automatic deployments trigger automatically whenever commits are pushed to `main`.
-2. **Render GitHub Integration:**
-   - In Render, create Web Service from `samiulislam56/LandGuard-AI` or select `render.yaml`.
-   - Set Root Directory to `backend`.
-   - Auto-deploy is enabled for `main`.
-3. **Path-Based Deploy Filtering:**
-   - Both platforms inspect monorepo paths (`frontend/**` vs `backend/**`), ensuring that frontend documentation or styling edits do not trigger unnecessary backend container rebuilds.
+| Run ID | Commit | Event | Status | Conclusion | URL |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **38862125438** | `86f1876` | push | completed | **success** | [Run 38862125438](https://github.com/samiulislam56/LandGuard-AI/actions/runs/38862125438) |
+| **38854917873** | `0e309f6` | push | completed | **success** | [Run 38854917873](https://github.com/samiulislam56/LandGuard-AI/actions/runs/38854917873) |
+
+---
+
+## 4. Automatic Webhook Deployment Sync
+
+1. **Vercel Native Integration:**
+   - When a commit is pushed to `main`, Vercel automatically checks out `main`, runs `npm ci` and `npm run build` in `frontend/`, and deploys the new static build to production.
+2. **Render Native Integration:**
+   - When a commit is pushed to `main`, Render detects changes in `backend/`, executes `pip install -r requirements.txt`, runs `uvicorn app.main:app`, and swaps the zero-downtime container once `/health` returns HTTP 200.
