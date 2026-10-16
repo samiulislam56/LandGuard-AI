@@ -186,10 +186,17 @@ def init_db():
             username TEXT PRIMARY KEY,
             hashed_password TEXT NOT NULL,
             salt TEXT NOT NULL DEFAULT '',
-            role TEXT NOT NULL DEFAULT 'reviewer',
+            role TEXT NOT NULL DEFAULT 'viewer',
+            full_name TEXT DEFAULT '',
+            email TEXT DEFAULT '',
             created_at TEXT NOT NULL
         )
     """)
+    for col in ("full_name", "email"):
+        try:
+            cursor.execute(f"ALTER TABLE users ADD COLUMN {col} TEXT DEFAULT ''")
+        except Exception:
+            pass
 
     # 4. Active Sessions Table
     cursor.execute("""

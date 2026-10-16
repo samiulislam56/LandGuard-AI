@@ -124,6 +124,15 @@ export interface LoginResponse {
   expires_at: string;
 }
 
+export interface RegisterPayload {
+  name?: string;
+  username: string;
+  email?: string;
+  role?: string;
+  password: string;
+  confirm_password?: string;
+}
+
 export interface ReviewAuditLog {
   id: number;
   case_id: string;

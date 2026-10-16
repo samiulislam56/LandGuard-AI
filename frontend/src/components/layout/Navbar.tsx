@@ -7,10 +7,13 @@ import {
   Sun,
   Menu,
   Languages,
-  Sparkles
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../context/ThemeContext';
 import { setLanguage } from '../../i18n';
+import { api } from '../../lib/api';
 
 interface NavbarProps {
   onOpenMobileMenu: () => void;
@@ -22,6 +25,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
   const { i18n } = useTranslation();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [globalSearch, setGlobalSearch] = useState('');
+
+  const { data: userProfile } = useQuery({
+    queryKey: ['authMe'],
+    queryFn: () => api.getMe(),
+  });
 
   const currentLang = i18n.language === 'bn' ? 'bn' : 'en';
 
@@ -94,8 +102,21 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
         </div>
       </form>
 
-      {/* Right: Guest Demo / Login Link, Language, Theme, Quick Shortcuts */}
+      {/* Right: Demo Mode Indicator, Guest Demo / Login Link, Language, Theme, Quick Shortcuts */}
       <div className="flex items-center gap-2">
+        {/* Visible Demo Mode / User Profile Badge (Problem 2) */}
+        {userProfile?.username === 'demo_guest' || !userProfile?.authenticated ? (
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100/90 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>{currentLang === 'bn' ? "ডেমো মোড" : "Demo Mode"}</span>
+          </div>
+        ) : (
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="truncate max-w-[100px]">{userProfile?.username}</span>
+          </div>
+        )}
+
         {/* Direct Demo / Login Link */}
         <Link
           to="/login"

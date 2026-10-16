@@ -18,7 +18,8 @@ import {
   ReviewUpdateRequest,
   ReviewAuditLog,
   RMDAuditResponse,
-  RMDParcelResponse
+  RMDParcelResponse,
+  RegisterPayload
 } from '../types/api';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/+$/, '');
@@ -146,6 +147,17 @@ export const api = {
     const res = await request<LoginResponse>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username, password })
+    });
+    if (res.token) {
+      authStorage.setToken(res.token);
+    }
+    return res;
+  },
+
+  register: async (payload: RegisterPayload): Promise<LoginResponse> => {
+    const res = await request<LoginResponse>('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload)
     });
     if (res.token) {
       authStorage.setToken(res.token);

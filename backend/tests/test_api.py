@@ -390,4 +390,100 @@ def test_direct_demo_auth_endpoint():
     assert len(data["token"]) > 20
 
 
+def test_public_registration_success():
+    import uuid
+    rand_user = f"citizen_{uuid.uuid4().hex[:6]}"
+    rand_email = f"{rand_user}@landguard.local"
+    payload = {
+        "name": "Md. Rafiqul Islam",
+        "username": rand_user,
+        "email": rand_email,
+        "role": "Farmer",
+        "password": "Password123#",
+        "confirm_password": "Password123#"
+    }
+    resp = client.post("/api/auth/register", json=payload)
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["username"] == rand_user
+    assert data["role"] == "viewer"
+    assert "token" in data
+
+
+def test_registration_duplicate_username_conflict():
+    import uuid
+    fixed_user = f"dup_{uuid.uuid4().hex[:6]}"
+    payload = {
+        "name": "Test User",
+        "username": fixed_user,
+        "password": "Password123#",
+        "confirm_password": "Password123#"
+    }
+    resp1 = client.post("/api/auth/register", json=payload)
+    assert resp1.status_code == 201
+
+    # Second attempt with same username
+    resp2 = client.post("/api/auth/register", json=payload)
+    assert resp2.status_code == 409
+    assert "already registered" in resp2.json()["detail"]
+
+
+def test_registration_password_mismatch():
+    payload = {
+        "name": "Mismatch User",
+        "username": "user_mismatch",
+        "password": "Password123#",
+        "confirm_password": "DifferentPassword!"
+    }
+    resp = client.post("/api/auth/register", json=payload)
+    assert resp.status_code == 422
+    assert "do not match" in resp.json()["detail"]
+
+
+def test_registration_reserved_username_rejected():
+    payload = {
+        "name": "Hacker",
+        "username": "admin",
+        "password": "Password123#",
+        "confirm_password": "Password123#"
+    }
+    resp = client.post("/api/auth/register", json=payload)
+    assert resp.status_code == 403
+    assert "reserved" in resp.json()["detail"]
+
+
+def test_guest_demo_user_cannot_mutate_reviews():
+    # Attempting to update a review case without reviewer credentials
+    resp = client.patch(
+        "/api/reviews/REV-000001",
+        json={"status": "APPROVED_VALID", "reviewer_notes": "Unauthorized guest mutation"}
+    )
+    # Unauthenticated guest defaults to 401
+    assert resp.status_code == 401
+
+
+def test_registered_viewer_user_cannot_mutate_reviews():
+    # Register an ordinary citizen
+    import uuid
+    rand_user = f"viewer_{uuid.uuid4().hex[:6]}"
+    reg_resp = client.post("/api/auth/register", json={
+        "name": "Ordinary Viewer",
+        "username": rand_user,
+        "password": "SecurePassword123!",
+        "confirm_password": "SecurePassword123!"
+    })
+    token = reg_resp.json()["token"]
+
+    # Attempt mutation with viewer token
+    resp = client.patch(
+        "/api/reviews/REV-000001",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"status": "APPROVED_VALID", "reviewer_notes": "Attempt by viewer"}
+    )
+    # Viewer role lacks permission: 403 Forbidden
+    assert resp.status_code == 403
+    assert "lacks permission" in resp.json()["detail"]
+
+
+
 

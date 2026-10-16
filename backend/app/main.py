@@ -18,9 +18,11 @@ from pydantic import BaseModel, Field
 from .database import init_db, get_db_connection
 from .auth import (
     LoginRequest,
+    RegisterRequest,
     LoginResponse,
     UserProfile,
     authenticate_user,
+    register_user,
     create_session,
     invalidate_session,
     get_current_user,
@@ -543,8 +545,20 @@ init_db()
 
 
 # ---------------------------------------------------------------------------
-# 11. Stage 4 — Authentication & User Sessions
+# 11. Stage 4 — Authentication, Registration & User Sessions
 # ---------------------------------------------------------------------------
+@app.post("/api/auth/register", response_model=LoginResponse, status_code=status.HTTP_201_CREATED)
+def register_endpoint(payload: RegisterRequest):
+    """
+    Public Citizen / User Registration:
+    - Argon2id password hashing
+    - Safe default role ('viewer')
+    - Disallows reserved administrator / reviewer usernames
+    - Returns active authorized session
+    """
+    return register_user(payload)
+
+
 @app.post("/api/auth/login", response_model=LoginResponse)
 def login_endpoint(credentials: LoginRequest):
     session = authenticate_user(credentials)
