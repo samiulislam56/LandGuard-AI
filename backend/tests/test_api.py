@@ -189,3 +189,129 @@ def test_all_five_datasets_loaded():
     assert len(tables["transactions"]) == 3851
     assert len(tables["mutations"]) == 3851
     assert len(tables["review_cases"]) == 1188
+
+
+# ---------------------------------------------------------------------------
+# STAGE 4 TESTS: AUTHENTICATION, RBAC, PERSISTENT REVIEW WORKSPACE, PDF REPORT
+# ---------------------------------------------------------------------------
+
+def test_auth_login_success_and_logout():
+    # 1. Login with reviewer credentials
+    resp = client.post("/api/auth/login", json={
+        "username": "reviewer",
+        "password": "ReviewerPass2026!"
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "token" in data
+    assert data["username"] == "reviewer"
+    assert data["role"] == "reviewer"
+
+    token = data["token"]
+
+    # 2. Check /api/auth/me with Bearer token
+    me_resp = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me_resp.status_code == 200
+    me_data = me_resp.json()
+    assert me_data["username"] == "reviewer"
+    assert me_data["authenticated"] is True
+
+    # 3. Logout
+    logout_resp = client.post("/api/auth/logout", headers={"Authorization": f"Bearer {token}"})
+    assert logout_resp.status_code == 200
+
+
+def test_auth_login_invalid_password():
+    resp = client.post("/api/auth/login", json={
+        "username": "reviewer",
+        "password": "WrongPassword123!"
+    })
+    assert resp.status_code == 401
+    assert "Invalid username or password" in resp.json()["detail"]
+
+
+def test_auth_me_unauthenticated_defaults_to_guest():
+    resp = client.get("/api/auth/me")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["username"] == "guest"
+    assert data["role"] == "viewer"
+    assert data["authenticated"] is False
+
+
+def test_reviews_list_and_filter():
+    resp = client.get("/api/reviews?limit=10&offset=0")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "items" in data
+    assert "total" in data
+    assert data["total"] > 0
+    assert len(data["items"]) <= 10
+
+    first_case = data["items"][0]
+    assert "case_id" in first_case
+    assert "transaction_id" in first_case
+    assert "review_status" in first_case
+
+
+def test_review_detail_and_patch_workflow():
+    # 1. Get first review case
+    list_resp = client.get("/api/reviews?limit=1")
+    assert list_resp.status_code == 200
+    case_id = list_resp.json()["items"][0]["case_id"]
+
+    # 2. Get case detail
+    detail_resp = client.get(f"/api/reviews/{case_id}")
+    assert detail_resp.status_code == 200
+    detail_data = detail_resp.json()
+    assert detail_data["case_id"] == case_id
+    assert "transaction_id" in detail_data
+
+    # 3. Unauthorized PATCH should be rejected (401)
+    unauth_patch = client.patch(f"/api/reviews/{case_id}", json={
+        "status": "IN_REVIEW",
+        "notes": "Unauthorized attempt"
+    })
+    assert unauth_patch.status_code == 401
+
+    # 4. Authenticate as reviewer
+    login_resp = client.post("/api/auth/login", json={
+        "username": "reviewer",
+        "password": "ReviewerPass2026!"
+    })
+    token = login_resp.json()["token"]
+    auth_header = {"Authorization": f"Bearer {token}"}
+
+    # 5. Authorized PATCH should succeed (200)
+    auth_patch = client.patch(
+        f"/api/reviews/{case_id}",
+        json={
+            "status": "APPROVED",
+            "notes": "Verified chain of custody and approved."
+        },
+        headers=auth_header
+    )
+    assert auth_patch.status_code == 200
+    patched_data = auth_patch.json()
+    assert patched_data["review_status"] in ("APPROVED", "APPROVED_VALID")
+    assert "Verified chain of custody" in patched_data["reviewer_notes"]
+
+    # 6. Verify audit history exists
+    hist_resp = client.get(f"/api/reviews/{case_id}/history")
+    assert hist_resp.status_code == 200
+    hist = hist_resp.json()
+    assert len(hist) >= 1
+    assert hist[0]["changed_by"] == "reviewer"
+    assert hist[0]["new_status"] in ("APPROVED", "APPROVED_VALID")
+
+
+def test_download_pdf_report_endpoint():
+    # Ground truth test transaction
+    resp = client.get("/api/reports/assessment/TX-002911-2")
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "application/pdf"
+    assert "attachment; filename=" in resp.headers["content-disposition"]
+    # PDF files start with %PDF- header magic bytes
+    assert resp.content.startswith(b"%PDF-")
+    assert len(resp.content) > 1000
+

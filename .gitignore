@@ -64,6 +64,11 @@ logs/
 scratch/
 .tempmediaStorage/
 
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
 # Operating System & IDE
 .DS_Store
 .DS_Store?

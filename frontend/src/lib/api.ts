@@ -9,10 +9,42 @@ import {
   TransactionListResponse,
   ParcelHistoryResponse,
   AssessmentResponse,
-  TransactionQueryFilters
+  TransactionQueryFilters,
+  UserProfile,
+  LoginResponse,
+  ReviewCase,
+  ReviewListResponse,
+  ReviewQueryFilters,
+  ReviewUpdateRequest,
+  ReviewAuditLog
 } from '../types/api';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/+$/, '');
+const TOKEN_KEY = 'landguard_auth_token';
+
+export const authStorage = {
+  getToken: (): string | null => {
+    try {
+      return localStorage.getItem(TOKEN_KEY);
+    } catch {
+      return null;
+    }
+  },
+  setToken: (token: string): void => {
+    try {
+      localStorage.setItem(TOKEN_KEY, token);
+    } catch {
+      // storage unavailable
+    }
+  },
+  clearToken: (): void => {
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+    } catch {
+      // storage unavailable
+    }
+  }
+};
 
 export class ApiError extends Error {
   constructor(
@@ -27,12 +59,16 @@ export class ApiError extends Error {
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE}${endpoint}`;
+  const token = authStorage.getToken();
+  const authHeaders: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
+
   try {
     const res = await fetch(url, {
       ...options,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        ...authHeaders,
         ...options.headers,
       },
     });
@@ -99,5 +135,89 @@ export const api = {
   getAssessment: async (transactionId: string, asOfDate?: string): Promise<AssessmentResponse> => {
     const params = asOfDate ? `?as_of_date=${encodeURIComponent(asOfDate)}` : '';
     return request<AssessmentResponse>(`/assess/${encodeURIComponent(transactionId)}${params}`);
+  },
+
+  // -------------------------------------------------------------------------
+  // Stage 4 — Authentication & RBAC
+  // -------------------------------------------------------------------------
+  login: async (username: string, password: string): Promise<LoginResponse> => {
+    const res = await request<LoginResponse>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password })
+    });
+    if (res.token) {
+      authStorage.setToken(res.token);
+    }
+    return res;
+  },
+
+  logout: async (): Promise<void> => {
+    try {
+      await request<{ status: string }>('/api/auth/logout', { method: 'POST' });
+    } finally {
+      authStorage.clearToken();
+    }
+  },
+
+  getMe: async (): Promise<UserProfile> => {
+    return request<UserProfile>('/api/auth/me');
+  },
+
+  // -------------------------------------------------------------------------
+  // Stage 4 — Persistent Review Case Workspace
+  // -------------------------------------------------------------------------
+  getReviews: async (filters: ReviewQueryFilters = {}): Promise<ReviewListResponse> => {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.scenario) params.append('scenario', filters.scenario);
+    if (filters.search) params.append('search', filters.search);
+    if (filters.limit !== undefined) params.append('limit', filters.limit.toString());
+    if (filters.offset !== undefined) params.append('offset', filters.offset.toString());
+
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return request<ReviewListResponse>(`/api/reviews${queryString}`);
+  },
+
+  getReviewDetail: async (caseId: string): Promise<ReviewCase> => {
+    return request<ReviewCase>(`/api/reviews/${encodeURIComponent(caseId)}`);
+  },
+
+  updateReview: async (caseId: string, update: ReviewUpdateRequest): Promise<ReviewCase> => {
+    return request<ReviewCase>(`/api/reviews/${encodeURIComponent(caseId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(update)
+    });
+  },
+
+  getReviewHistory: async (caseId: string): Promise<ReviewAuditLog[]> => {
+    return request<ReviewAuditLog[]>(`/api/reviews/${encodeURIComponent(caseId)}/history`);
+  },
+
+  // -------------------------------------------------------------------------
+  // Stage 4 — Real Downloadable Assessment PDF Report
+  // -------------------------------------------------------------------------
+  getAssessmentPdfUrl: (transactionId: string, asOfDate?: string): string => {
+    const params = asOfDate ? `?as_of_date=${encodeURIComponent(asOfDate)}` : '';
+    return `${API_BASE}/api/reports/assessment/${encodeURIComponent(transactionId)}${params}`;
+  },
+
+  downloadAssessmentPdf: async (transactionId: string, asOfDate?: string): Promise<void> => {
+    const url = api.getAssessmentPdfUrl(transactionId, asOfDate);
+    const token = authStorage.getToken();
+    const headers: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+      throw new ApiError(`Failed to download PDF report: ${res.statusText}`, res.status);
+    }
+    const blob = await res.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `LandGuard_Assessment_${transactionId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
   }
 };

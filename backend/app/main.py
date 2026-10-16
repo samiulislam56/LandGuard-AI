@@ -2,7 +2,7 @@ import os
 import time
 import logging
 from pathlib import Path
-from datetime import date
+from datetime import date, datetime, timezone
 from functools import lru_cache
 from typing import Optional, Dict, Any, List
 
@@ -10,10 +10,22 @@ import pandas as pd
 import numpy as np
 import joblib
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Query, Request, Response, Depends, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+from .database import init_db, get_db_connection
+from .auth import (
+    LoginRequest,
+    LoginResponse,
+    UserProfile,
+    authenticate_user,
+    invalidate_session,
+    get_current_user,
+    require_role,
+)
+from .reports import generate_assessment_pdf
 
 # ---------------------------------------------------------------------------
 # 1. Base Paths & Configuration Settings
@@ -514,3 +526,250 @@ def assess_endpoint(
     as_of_date: date = Query(default=settings.DEFAULT_ASSESSMENT_DATE)
 ):
     return assess(transaction_id, as_of_date)
+
+
+# ---------------------------------------------------------------------------
+# 10. Stage 4 — Database Initialization & Startup
+# ---------------------------------------------------------------------------
+@app.on_event("startup")
+def on_startup():
+    init_db()
+    logger.info("Stage 4 persistent review database and RBAC initialized.")
+
+
+# Initialize DB immediately on module import
+init_db()
+
+
+# ---------------------------------------------------------------------------
+# 11. Stage 4 — Authentication & User Sessions
+# ---------------------------------------------------------------------------
+@app.post("/api/auth/login", response_model=LoginResponse)
+def login_endpoint(credentials: LoginRequest):
+    session = authenticate_user(credentials)
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid username or password. Valid demo users: 'reviewer' or 'admin'."
+        )
+    return session
+
+
+@app.post("/api/auth/logout")
+def logout_endpoint(request: Request):
+    auth_header = request.headers.get("Authorization")
+    token = None
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ", 1)[1].strip()
+    elif request.headers.get("X-Auth-Token"):
+        token = request.headers.get("X-Auth-Token").strip()
+
+    if token:
+        invalidate_session(token)
+    return {"status": "logged_out"}
+
+
+@app.get("/api/auth/me", response_model=UserProfile)
+def get_me_endpoint(user: UserProfile = Depends(get_current_user)):
+    return user
+
+
+# ---------------------------------------------------------------------------
+# 12. Stage 4 — Persistent Review Case Workspace
+# ---------------------------------------------------------------------------
+class ReviewUpdateRequest(BaseModel):
+    status: Optional[str] = Field(None, description="Review status: UNREVIEWED, IN_REVIEW, APPROVED_VALID, FLAGGED_DISPUTE, REJECTED")
+    reviewer_notes: Optional[str] = Field(None, description="Auditor investigation notes")
+    notes: Optional[str] = Field(None, description="Alias for reviewer_notes")
+    assigned_reviewer: Optional[str] = Field(None, description="Assigned reviewer username")
+
+
+@app.get("/api/reviews")
+def list_review_cases(
+    status: Optional[str] = None,
+    scenario: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0)
+):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT * FROM review_cases WHERE 1=1"
+    count_query = "SELECT COUNT(*) FROM review_cases WHERE 1=1"
+    params: List[Any] = []
+    count_params: List[Any] = []
+
+    if status:
+        query += " AND review_status = ?"
+        count_query += " AND review_status = ?"
+        params.append(status.strip().upper())
+        count_params.append(status.strip().upper())
+
+    if scenario:
+        query += " AND flagged_scenario = ?"
+        count_query += " AND flagged_scenario = ?"
+        params.append(scenario.strip().lower())
+        count_params.append(scenario.strip().lower())
+
+    if search:
+        s = f"%{search.strip()}%"
+        query += " AND (case_id LIKE ? OR transaction_id LIKE ? OR parcel_id LIKE ?)"
+        count_query += " AND (case_id LIKE ? OR transaction_id LIKE ? OR parcel_id LIKE ?)"
+        params.extend([s, s, s])
+        count_params.extend([s, s, s])
+
+    cursor.execute(count_query, count_params)
+    total = cursor.fetchone()[0]
+
+    query += " ORDER BY case_id ASC LIMIT ? OFFSET ?"
+    params.extend([limit, offset])
+
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    conn.close()
+
+    items = [dict(r) for r in rows]
+    return {
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "items": items
+    }
+
+
+@app.get("/api/reviews/{case_id}")
+def get_review_case(case_id: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM review_cases WHERE case_id = ?", (case_id.strip(),))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail=f"Review case '{case_id}' not found.")
+
+    case_dict = dict(row)
+
+    # Fetch audit history
+    cursor.execute("SELECT * FROM review_audit_log WHERE case_id = ? ORDER BY id DESC", (case_id.strip(),))
+    history_rows = cursor.fetchall()
+    conn.close()
+
+    case_dict["history"] = [dict(h) for h in history_rows]
+
+    # Augment with transaction details if available
+    try:
+        tables, _, _ = resources()
+        tx_row = tables["transactions"][tables["transactions"]["transaction_id"] == case_dict["transaction_id"]]
+        if not tx_row.empty:
+            case_dict["transaction_details"] = clean(tx_row.iloc[0].to_dict())
+    except Exception as e:
+        logger.warning(f"Could not fetch transaction details for review case {case_id}: {e}")
+
+    return clean(case_dict)
+
+
+@app.patch("/api/reviews/{case_id}")
+def update_review_case(
+    case_id: str,
+    update: ReviewUpdateRequest,
+    current_user: UserProfile = Depends(require_role(["reviewer", "admin"]))
+):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM review_cases WHERE case_id = ?", (case_id.strip(),))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail=f"Review case '{case_id}' not found.")
+
+    current_case = dict(row)
+    prev_status = current_case["review_status"]
+    raw_status = update.status.strip().upper() if update.status else prev_status
+
+    status_alias = {
+        "APPROVED": "APPROVED_VALID",
+        "DISPUTED": "FLAGGED_DISPUTE",
+        "DISPUTE": "FLAGGED_DISPUTE",
+    }
+    new_status = status_alias.get(raw_status, raw_status)
+
+    valid_statuses = {"UNREVIEWED", "IN_REVIEW", "APPROVED_VALID", "FLAGGED_DISPUTE", "REJECTED"}
+    if new_status not in valid_statuses:
+        conn.close()
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid status '{new_status}'. Allowed values: {sorted(list(valid_statuses))}"
+        )
+
+    incoming_notes = update.reviewer_notes if update.reviewer_notes is not None else update.notes
+    new_notes = incoming_notes if incoming_notes is not None else current_case["reviewer_notes"]
+    new_assignee = update.assigned_reviewer if update.assigned_reviewer is not None else (current_case["assigned_reviewer"] or current_user.username)
+    now = datetime.now(timezone.utc).isoformat()
+
+    cursor.execute("""
+        UPDATE review_cases 
+        SET review_status = ?, reviewer_notes = ?, assigned_reviewer = ?, updated_at = ?
+        WHERE case_id = ?
+    """, (new_status, new_notes, new_assignee, now, case_id.strip()))
+
+    # Record audit trail
+    audit_notes = incoming_notes or f"Review status updated from {prev_status} to {new_status}"
+    cursor.execute("""
+        INSERT INTO review_audit_log (case_id, previous_status, new_status, changed_by, notes, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (case_id.strip(), prev_status, new_status, current_user.username, audit_notes, now))
+    conn.commit()
+
+    cursor.execute("SELECT * FROM review_cases WHERE case_id = ?", (case_id.strip(),))
+    updated_row = cursor.fetchone()
+
+    cursor.execute("SELECT * FROM review_audit_log WHERE case_id = ? ORDER BY id DESC", (case_id.strip(),))
+    history_rows = cursor.fetchall()
+    conn.close()
+
+    res = dict(updated_row)
+    res["history"] = [dict(h) for h in history_rows]
+    return clean(res)
+
+
+@app.get("/api/reviews/{case_id}/history")
+def get_case_audit_history(case_id: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM review_audit_log WHERE case_id = ? ORDER BY id DESC", (case_id.strip(),))
+    rows = cursor.fetchall()
+    conn.close()
+    return clean([dict(r) for r in rows])
+
+
+# ---------------------------------------------------------------------------
+# 13. Stage 4 — Real Downloadable Assessment PDF Report
+# ---------------------------------------------------------------------------
+@app.get("/api/reports/assessment/{transaction_id}")
+def download_assessment_report(
+    transaction_id: str,
+    as_of_date: date = Query(default=settings.DEFAULT_ASSESSMENT_DATE)
+):
+    tables, _, _ = resources()
+    tx_row = get_record(tables["transactions"], "transaction_id", transaction_id)
+    tx_data = clean(tx_row.to_dict())
+
+    parcel_id = tx_data["parcel_id"]
+    parcel_row = get_record(tables["parcels"], "parcel_id", parcel_id)
+    parcel_data = clean(parcel_row.to_dict())
+
+    assessment_data = assess(transaction_id, as_of_date)
+
+    pdf_bytes = generate_assessment_pdf(assessment_data, tx_data, parcel_data)
+
+    filename = f"LandGuard_Forensic_Dossier_{transaction_id}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-cache",
+        }
+    )
+

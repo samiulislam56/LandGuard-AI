@@ -110,3 +110,62 @@ export interface TransactionQueryFilters {
   limit?: number;
   offset?: number;
 }
+
+export interface UserProfile {
+  username: string;
+  role: 'admin' | 'reviewer' | 'viewer';
+  authenticated: boolean;
+}
+
+export interface LoginResponse {
+  token: string;
+  username: string;
+  role: string;
+  expires_at: string;
+}
+
+export interface ReviewAuditLog {
+  id: number;
+  case_id: string;
+  previous_status: string;
+  new_status: string;
+  changed_by: string;
+  notes: string;
+  timestamp: string;
+}
+
+export interface ReviewCase {
+  case_id: string;
+  transaction_id: string;
+  parcel_id: string;
+  flagged_scenario: string;
+  review_status: 'UNREVIEWED' | 'IN_REVIEW' | 'APPROVED_VALID' | 'FLAGGED_DISPUTE' | 'REJECTED';
+  reviewer_notes?: string;
+  assigned_reviewer?: string;
+  created_at: string;
+  updated_at: string;
+  transaction_details?: Transaction;
+  history?: ReviewAuditLog[];
+}
+
+export interface ReviewListResponse {
+  total: number;
+  limit: number;
+  offset: number;
+  items: ReviewCase[];
+}
+
+export interface ReviewQueryFilters {
+  status?: string;
+  scenario?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface ReviewUpdateRequest {
+  status?: string;
+  reviewer_notes?: string;
+  notes?: string;
+  assigned_reviewer?: string;
+}

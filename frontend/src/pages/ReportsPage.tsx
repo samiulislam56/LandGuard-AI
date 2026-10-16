@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import {
   FileText,
   Printer,
-  Lock,
+  Download,
+  ShieldCheck,
+  CheckCircle2
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +17,8 @@ import { Skeleton } from '../components/ui/Skeleton';
 
 export const ReportsPage: React.FC = () => {
   const [selectedTx, setSelectedTx] = useState('TX-002911-2');
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
   const { t } = useTranslation();
 
   const { data: assessment, isLoading } = useQuery({
@@ -26,6 +30,19 @@ export const ReportsPage: React.FC = () => {
     window.print();
   };
 
+  const handleDownloadPdf = async () => {
+    try {
+      setIsDownloading(true);
+      await api.downloadAssessmentPdf(selectedTx, '2026-10-15');
+      setDownloadSuccess(true);
+      setTimeout(() => setDownloadSuccess(false), 4000);
+    } catch (err) {
+      console.error('PDF download error:', err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -33,12 +50,12 @@ export const ReportsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-atlas-cyan" aria-hidden="true" />
-            <h1 className="text-2xl font-bold tracking-tight text-atlas-textPrimary">
+            <h1 className="text-2xl font-bold tracking-tight text-atlas-textPrimary font-mono">
               {t('nav.reports')}
             </h1>
           </div>
           <p className="text-sm text-atlas-textMuted mt-1">
-            Exportable forensic screening report for transaction dispute review and title verification.
+            Forensic Cadastral Dossier &bull; Real Backend PDF Stream via ReportLab
           </p>
         </div>
 
@@ -51,19 +68,34 @@ export const ReportsPage: React.FC = () => {
           >
             {t('common.export')} / Print
           </Button>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleDownloadPdf}
+            isLoading={isDownloading}
+            leftIcon={<Download className="w-3.5 h-3.5" />}
+          >
+            Download PDF Report
+          </Button>
         </div>
       </div>
 
-      {/* Stage 3 Boundary Notice */}
-      <Card className="border-atlas-cyan/30 bg-atlas-cyan/10 p-4">
+      {/* Stage 4 PDF Active Notice */}
+      <Card className="border-emerald-500/30 bg-emerald-950/20 p-4">
         <div className="flex items-start gap-3 text-xs">
-          <Lock className="w-4 h-4 text-atlas-cyan shrink-0 mt-0.5" aria-hidden="true" />
+          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
           <div className="space-y-1">
-            <h4 className="font-bold text-atlas-cyan">
-              Report Generation Architecture Preview
+            <h4 className="font-bold text-emerald-400 flex items-center gap-2">
+              <span>Stage 4 Server-Side PDF Stream Active</span>
+              {downloadSuccess && (
+                <span className="text-emerald-300 flex items-center gap-1 font-normal">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> PDF generated and downloaded!
+                </span>
+              )}
             </h4>
             <p className="text-atlas-textMuted leading-relaxed">
-              Binary server-side PDF stream compilation (`GET /reports/:id.pdf`) is scheduled for Stage 4/5. Below is the responsive on-screen printable forensic summary verifying all required report metadata fields.
+              Real institutional PDF reports are compiled on the FastAPI backend using ReportLab at <code className="text-atlas-cyan font-mono">GET /api/reports/assessment/:tx_id</code>. Includes forensic assessment status, dual-model signals, evidence verification findings, and mandatory legal disclaimers.
             </p>
           </div>
         </div>

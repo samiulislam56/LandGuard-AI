@@ -13,6 +13,7 @@ import {
   Search,
   AlertOctagon,
   CheckCircle2,
+  Download,
 } from 'lucide-react';
 
 import { api } from '../lib/api';
@@ -28,6 +29,7 @@ export const AssessmentPage: React.FC = () => {
 
   const [asOfDate, setAsOfDate] = useState('2026-10-15');
   const [targetId, setTargetId] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const {
     data: assessment,
@@ -107,6 +109,26 @@ export const AssessmentPage: React.FC = () => {
               <Search className="w-3.5 h-3.5" />
             </Button>
           </form>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={async () => {
+              try {
+                setIsDownloading(true);
+                await api.downloadAssessmentPdf(id, asOfDate);
+              } catch (err) {
+                console.error(err);
+              } finally {
+                setIsDownloading(false);
+              }
+            }}
+            isLoading={isDownloading}
+            leftIcon={<Download className="w-3.5 h-3.5" />}
+            className="text-xs font-mono"
+          >
+            PDF Report
+          </Button>
         </div>
       </div>
 
