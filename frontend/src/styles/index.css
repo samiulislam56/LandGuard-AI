@@ -1,0 +1,83 @@
+@import './tokens.css';
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Accessible focus indicators for keyboard navigation */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Custom Leaflet Tooltip & Popup styling */
+.cadastral-map-tooltip {
+  background-color: rgba(11, 32, 35, 0.92) !important;
+  color: #F1F5F2 !important;
+  border: 1px solid rgba(37, 182, 160, 0.4) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  padding: 4px 8px !important;
+}
+
+.cadastral-map-tooltip::before {
+  border-top-color: rgba(11, 32, 35, 0.92) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background-color: #10282B !important;
+  color: #F1F5F2 !important;
+  border: 1px solid rgba(37, 182, 160, 0.35) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background-color: #10282B !important;
+}
+
+@layer utilities {
+  /* Subtle cadastral plot grid overlay */
+  .cadastral-grid {
+    background-size: 24px 24px;
+    background-image: 
+      linear-gradient(to right, rgba(22, 61, 60, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(22, 61, 60, 0.05) 1px, transparent 1px);
+  }
+
+  .dark .cadastral-grid {
+    background-image: 
+      linear-gradient(to right, rgba(37, 182, 160, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(37, 182, 160, 0.05) 1px, transparent 1px);
+  }
+
+  /* Custom institutional scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(37, 182, 160, 0.2);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(37, 182, 160, 0.4);
+  }
+}
