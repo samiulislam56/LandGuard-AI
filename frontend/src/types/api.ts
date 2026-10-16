@@ -243,7 +243,7 @@ export interface RMDAuditResponse {
 
 export interface RMDParcelResponse {
   parcel_id: string;
-  parcel_meta: Record<string, any>;
+  parcel_meta: Record<string, unknown>;
   transactions_count: number;
   overall_rmd_health: 'DISCREPANCIES_DETECTED' | 'ALIGNED_OR_REVIEW';
   audits: RMDAuditResponse[];

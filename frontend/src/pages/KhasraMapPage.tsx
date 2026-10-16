@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
+import { Badge, type BadgeVariant } from '../components/ui/Badge';
 import { CadastralMap } from '../components/gis/CadastralMap';
 
 // Schematic plots layout for Aminbazar Mouza (Inspired by Reference 3 & 4)
@@ -55,7 +55,7 @@ export const KhasraMapPage: React.FC = () => {
 
   const selectedPlot = SCHEMATIC_PLOTS.find(p => p.dag_no === selectedDag) || SCHEMATIC_PLOTS[1];
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): { fill: string; stroke: string; badge: BadgeVariant; label: string } => {
     switch (status) {
       case 'conflict': return { fill: 'rgba(239, 68, 68, 0.25)', stroke: '#DC2626', badge: 'danger', label: isBn ? 'দ্বন্দ্বমূলক বিক্রয়' : 'Conflict' };
       case 'mismatch': return { fill: 'rgba(245, 158, 11, 0.25)', stroke: '#D97706', badge: 'warning', label: isBn ? 'নামজারি অমিল' : 'Mismatch' };
@@ -244,7 +244,7 @@ export const KhasraMapPage: React.FC = () => {
                     {isBn ? "দাগ নং:" : "Dag No:"} {selectedPlot.dag_no}
                   </h3>
                 </div>
-                <Badge variant={getStatusColor(selectedPlot.status).badge as any}>
+                <Badge variant={getStatusColor(selectedPlot.status).badge}>
                   {getStatusColor(selectedPlot.status).label}
                 </Badge>
               </div>
