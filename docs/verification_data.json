@@ -1,0 +1,496 @@
+{
+  "environment": {
+    "python_version": "3.12.15",
+    "python_path": "E:\\LandGuard-AI\\.venv\\Scripts\\python.exe",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "fastapi": "0.143.2",
+      "pydantic": "2.14.1",
+      "scikit-learn": "1.9.1",
+      "joblib": "1.6.0",
+      "pandas": "3.0.6",
+      "numpy": "2.5.4"
+    }
+  },
+  "models": {
+    "random_forest": {
+      "loaded": true,
+      "type": "<class 'sklearn.ensemble._forest.RandomForestClassifier'>",
+      "classes": [
+        "INSUFFICIENT_EVIDENCE",
+        "NO_REVIEW_FLAG_DETECTED",
+        "REVIEW_REQUIRED"
+      ],
+      "n_estimators": 200,
+      "n_features_in": 9,
+      "feature_names_in": [
+        "registered",
+        "prior_transaction_exists",
+        "legitimate_resale_evidence",
+        "seller_owner_mismatch",
+        "area_mismatch",
+        "mutation_mismatch",
+        "document_hash_mismatch",
+        "overlapping_claim",
+        "missing_evidence"
+      ]
+    },
+    "isolation_forest": {
+      "loaded": true,
+      "bundle_keys": [
+        "pipeline",
+        "features",
+        "train_medians"
+      ],
+      "features": [
+        "sale_area_acres",
+        "claimed_share",
+        "transaction_month",
+        "transaction_day",
+        "prior_transaction_exists",
+        "legitimate_resale_evidence"
+      ],
+      "train_medians": {
+        "sale_area_acres": 0.713,
+        "claimed_share": 0.5,
+        "transaction_month": 6.0,
+        "transaction_day": 14.0,
+        "prior_transaction_exists": 0.0,
+        "legitimate_resale_evidence": 0.0
+      },
+      "pipeline_steps": [
+        "scaler",
+        "isolation_forest"
+      ]
+    }
+  },
+  "datasets": {
+    "parcels": {
+      "row_count": 3000,
+      "column_count": 9,
+      "columns": [
+        "parcel_id",
+        "district",
+        "upazila",
+        "mouza",
+        "jl_no",
+        "dag_no",
+        "khatian_no",
+        "total_area_acres",
+        "data_origin"
+      ]
+    },
+    "ownership": {
+      "row_count": 3000,
+      "column_count": 7,
+      "columns": [
+        "ownership_id",
+        "parcel_id",
+        "person_alias",
+        "ownership_share",
+        "start_date",
+        "status",
+        "data_origin"
+      ]
+    },
+    "transactions": {
+      "row_count": 3851,
+      "column_count": 18,
+      "columns": [
+        "transaction_id",
+        "parcel_id",
+        "transaction_date",
+        "seller_alias",
+        "buyer_alias",
+        "sale_area_acres",
+        "claimed_share",
+        "registered",
+        "prior_transaction_exists",
+        "legitimate_resale_evidence",
+        "seller_owner_mismatch",
+        "area_mismatch",
+        "mutation_mismatch",
+        "document_hash_mismatch",
+        "overlapping_claim",
+        "missing_evidence",
+        "scenario",
+        "data_origin"
+      ]
+    },
+    "mutations": {
+      "row_count": 3851,
+      "column_count": 6,
+      "columns": [
+        "mutation_id",
+        "transaction_id",
+        "parcel_id",
+        "record_consistency",
+        "status",
+        "data_origin"
+      ]
+    },
+    "review_cases": {
+      "row_count": 1188,
+      "column_count": 5,
+      "columns": [
+        "case_id",
+        "transaction_id",
+        "scenario",
+        "review_status",
+        "data_origin"
+      ]
+    }
+  },
+  "endpoints": {
+    "health": {
+      "path": "/health",
+      "status_code": 200,
+      "body": {
+        "status": "ok",
+        "models_loaded": 2,
+        "datasets_loaded": 5
+      }
+    },
+    "dashboard_summary": {
+      "path": "/dashboard/summary",
+      "status_code": 200,
+      "body": {
+        "parcels": 3000,
+        "transactions": 3851,
+        "review_cases": 1188,
+        "multiple_transaction_parcels": 712,
+        "scenario_counts": {
+          "normal": 2609,
+          "owner_mismatch": 282,
+          "area_mismatch": 226,
+          "mutation_mismatch": 223,
+          "incomplete": 195,
+          "document_tamper": 189,
+          "conflicting_sale": 73,
+          "legitimate_resale": 54
+        },
+        "data_origin": "SYNTHETIC"
+      }
+    },
+    "transactions_limit_5": {
+      "path": "/transactions?limit=5",
+      "status_code": 200,
+      "body": {
+        "total": 3851,
+        "limit": 5,
+        "offset": 0,
+        "items": [
+          {
+            "transaction_id": "TX-000001-1",
+            "parcel_id": "LG-P-000001",
+            "transaction_date": "2026-02-02",
+            "seller_alias": "PERSON-000001",
+            "buyer_alias": "BUYER-000001-1",
+            "sale_area_acres": 0.452,
+            "claimed_share": 1.0,
+            "registered": 1,
+            "prior_transaction_exists": 0,
+            "legitimate_resale_evidence": 0,
+            "seller_owner_mismatch": 0,
+            "area_mismatch": 0,
+            "mutation_mismatch": 0,
+            "document_hash_mismatch": 0,
+            "overlapping_claim": 0,
+            "missing_evidence": 0,
+            "scenario": "normal",
+            "data_origin": "SYNTHETIC"
+          },
+          {
+            "transaction_id": "TX-000001-2",
+            "parcel_id": "LG-P-000001",
+            "transaction_date": "2026-05-02",
+            "seller_alias": "PERSON-000001",
+            "buyer_alias": "BUYER-000001-2",
+            "sale_area_acres": 0.452,
+            "claimed_share": 1.0,
+            "registered": 1,
+            "prior_transaction_exists": 1,
+            "legitimate_resale_evidence": 1,
+            "seller_owner_mismatch": 0,
+            "area_mismatch": 0,
+            "mutation_mismatch": 0,
+            "document_hash_mismatch": 0,
+            "overlapping_claim": 0,
+            "missing_evidence": 0,
+            "scenario": "legitimate_resale",
+            "data_origin": "SYNTHETIC"
+          },
+          {
+            "transaction_id": "TX-000001-3",
+            "parcel_id": "LG-P-000001",
+            "transaction_date": "2026-08-02",
+            "seller_alias": "PERSON-000001",
+            "buyer_alias": "BUYER-000001-3",
+            "sale_area_acres": 0.452,
+            "claimed_share": 1.0,
+            "registered": 1,
+            "prior_transaction_exists": 1,
+            "legitimate_resale_evidence": 0,
+            "seller_owner_mismatch": 0,
+            "area_mismatch": 0,
+            "mutation_mismatch": 0,
+            "document_hash_mismatch": 1,
+            "overlapping_claim": 0,
+            "missing_evidence": 0,
+            "scenario": "document_tamper",
+            "data_origin": "SYNTHETIC"
+          },
+          {
+            "transaction_id": "TX-000002-1",
+            "parcel_id": "LG-P-000002",
+            "transaction_date": "2026-03-03",
+            "seller_alias": "PERSON-000002",
+            "buyer_alias": "BUYER-000002-1",
+            "sale_area_acres": 3.59,
+            "claimed_share": 1.0,
+            "registered": 1,
+            "prior_transaction_exists": 0,
+            "legitimate_resale_evidence": 0,
+            "seller_owner_mismatch": 0,
+            "area_mismatch": 1,
+            "mutation_mismatch": 0,
+            "document_hash_mismatch": 0,
+            "overlapping_claim": 0,
+            "missing_evidence": 0,
+            "scenario": "area_mismatch",
+            "data_origin": "SYNTHETIC"
+          },
+          {
+            "transaction_id": "TX-000003-1",
+            "parcel_id": "LG-P-000003",
+            "transaction_date": "2026-04-04",
+            "seller_alias": "PERSON-000003",
+            "buyer_alias": "BUYER-000003-1",
+            "sale_area_acres": 1.789,
+            "claimed_share": 1.0,
+            "registered": 1,
+            "prior_transaction_exists": 0,
+            "legitimate_resale_evidence": 0,
+            "seller_owner_mismatch": 0,
+            "area_mismatch": 0,
+            "mutation_mismatch": 0,
+            "document_hash_mismatch": 0,
+            "overlapping_claim": 0,
+            "missing_evidence": 0,
+            "scenario": "normal",
+            "data_origin": "SYNTHETIC"
+          }
+        ]
+      }
+    },
+    "transaction_detail_TX_002911_2": {
+      "path": "/transactions/TX-002911-2",
+      "status_code": 200,
+      "body": {
+        "transaction_id": "TX-002911-2",
+        "parcel_id": "LG-P-002911",
+        "transaction_date": "2026-08-23",
+        "seller_alias": "PERSON-002911",
+        "buyer_alias": "BUYER-002911-2",
+        "sale_area_acres": 0.195,
+        "claimed_share": 0.5,
+        "registered": 0,
+        "prior_transaction_exists": 1,
+        "legitimate_resale_evidence": 0,
+        "seller_owner_mismatch": 0,
+        "area_mismatch": 0,
+        "mutation_mismatch": 0,
+        "document_hash_mismatch": 0,
+        "overlapping_claim": 1,
+        "missing_evidence": 0,
+        "scenario": "conflicting_sale",
+        "data_origin": "SYNTHETIC"
+      }
+    },
+    "parcel_history_LG_P_002911": {
+      "path": "/parcels/LG-P-002911/history",
+      "status_code": 200,
+      "body": {
+        "parcel": {
+          "parcel_id": "LG-P-002911",
+          "district": "Khulna",
+          "upazila": "Dumuria",
+          "mouza": "Raghunathpur",
+          "jl_no": "JL-032",
+          "dag_no": 611,
+          "khatian_no": 1211,
+          "total_area_acres": 0.39,
+          "data_origin": "SYNTHETIC"
+        },
+        "total_transactions": 3,
+        "transactions": [
+          {
+            "transaction_id": "TX-002911-1",
+            "parcel_id": "LG-P-002911",
+            "transaction_date": "2026-05-23",
+            "seller_alias": "PERSON-002911",
+            "buyer_alias": "BUYER-002911-1",
+            "sale_area_acres": 0.195,
+            "claimed_share": 0.5,
+            "registered": 0,
+            "prior_transaction_exists": 0,
+            "legitimate_resale_evidence": 0,
+            "seller_owner_mismatch": 0,
+            "area_mismatch": 0,
+            "mutation_mismatch": 0,
+            "document_hash_mismatch": 0,
+            "overlapping_claim": 0,
+            "missing_evidence": 1,
+            "scenario": "incomplete",
+            "data_origin": "SYNTHETIC"
+          },
+          {
+            "transaction_id": "TX-002911-2",
+            "parcel_id": "LG-P-002911",
+            "transaction_date": "2026-08-23",
+            "seller_alias": "PERSON-002911",
+            "buyer_alias": "BUYER-002911-2",
+            "sale_area_acres": 0.195,
+            "claimed_share": 0.5,
+            "registered": 0,
+            "prior_transaction_exists": 1,
+            "legitimate_resale_evidence": 0,
+            "seller_owner_mismatch": 0,
+            "area_mismatch": 0,
+            "mutation_mismatch": 0,
+            "document_hash_mismatch": 0,
+            "overlapping_claim": 1,
+            "missing_evidence": 0,
+            "scenario": "conflicting_sale",
+            "data_origin": "SYNTHETIC"
+          },
+          {
+            "transaction_id": "TX-002911-3",
+            "parcel_id": "LG-P-002911",
+            "transaction_date": "2026-11-23",
+            "seller_alias": "PERSON-002911",
+            "buyer_alias": "BUYER-002911-3",
+            "sale_area_acres": 0.195,
+            "claimed_share": 0.5,
+            "registered": 1,
+            "prior_transaction_exists": 1,
+            "legitimate_resale_evidence": 0,
+            "seller_owner_mismatch": 0,
+            "area_mismatch": 0,
+            "mutation_mismatch": 0,
+            "document_hash_mismatch": 0,
+            "overlapping_claim": 0,
+            "missing_evidence": 0,
+            "scenario": "normal",
+            "data_origin": "SYNTHETIC"
+          }
+        ]
+      }
+    },
+    "assess_TX_002911_2": {
+      "path": "/assess/TX-002911-2",
+      "status_code": 200,
+      "body": {
+        "transaction_id": "TX-002911-2",
+        "parcel_id": "LG-P-002911",
+        "assessment_date": "2026-10-15",
+        "final_status": "REVIEW_REQUIRED",
+        "random_forest": {
+          "prediction": "REVIEW_REQUIRED"
+        },
+        "isolation_forest": {
+          "status": "NORMAL_PATTERN",
+          "decision_score": 0.05085897568352449
+        },
+        "evidence_verification": {
+          "status": "REVIEW_REQUIRED",
+          "findings": [
+            "Potential overlapping claim indicator",
+            "Potential repeated sale to different buyers"
+          ],
+          "warnings": [
+            "Mutation is not approved"
+          ],
+          "evidence": {
+            "parcel_area_acres": 0.39,
+            "sale_area_acres": 0.195,
+            "previous_transaction_ids": [
+              "TX-002911-1"
+            ]
+          }
+        },
+        "human_review_recommended": true,
+        "disclaimer": "Synthetic-data screening only. No finding proves fraud or legal ownership."
+      }
+    }
+  },
+  "assessment_cases": {
+    "TX-002911-1": {
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "actual": "INSUFFICIENT_EVIDENCE",
+      "match": true,
+      "random_forest": {
+        "prediction": "INSUFFICIENT_EVIDENCE"
+      },
+      "isolation_forest": {
+        "status": "NORMAL_PATTERN",
+        "decision_score": 0.1342130755893951
+      },
+      "findings": [],
+      "warnings": [
+        "Mutation is not approved",
+        "Supporting evidence is incomplete"
+      ]
+    },
+    "TX-002911-2": {
+      "expected": "REVIEW_REQUIRED",
+      "actual": "REVIEW_REQUIRED",
+      "match": true,
+      "random_forest": {
+        "prediction": "REVIEW_REQUIRED"
+      },
+      "isolation_forest": {
+        "status": "NORMAL_PATTERN",
+        "decision_score": 0.05085897568352449
+      },
+      "findings": [
+        "Potential overlapping claim indicator",
+        "Potential repeated sale to different buyers"
+      ],
+      "warnings": [
+        "Mutation is not approved"
+      ]
+    },
+    "TX-002911-3": {
+      "expected": "PENDING_DATE_VERIFICATION",
+      "actual": "PENDING_DATE_VERIFICATION",
+      "match": true,
+      "random_forest": {
+        "prediction": "NO_REVIEW_FLAG_DETECTED"
+      },
+      "isolation_forest": {
+        "status": "NORMAL_PATTERN",
+        "decision_score": 0.03280734241041461
+      },
+      "findings": [
+        "Potential repeated sale to different buyers"
+      ],
+      "warnings": [
+        "Future-dated transaction",
+        "Previous overlapping claim indicator in parcel history"
+      ]
+    }
+  },
+  "unknown_tx_404": {
+    "status_code": 404,
+    "body": {
+      "detail": "Record not found: TX-NONEXISTENT-999"
+    },
+    "pass": true
+  },
+  "invalid_pagination_422": {
+    "limit_negative_status": 422,
+    "limit_exceeded_status": 422,
+    "pass": true
+  }
+}
