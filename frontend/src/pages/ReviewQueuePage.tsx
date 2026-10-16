@@ -41,8 +41,8 @@ export const ReviewQueuePage: React.FC = () => {
 
   // Auth Dialog State
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [loginUsername, setLoginUsername] = useState('reviewer');
-  const [loginPassword, setLoginPassword] = useState('ReviewerPass2026!');
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
   // Review Form Mutation State
@@ -617,16 +617,9 @@ export const ReviewQueuePage: React.FC = () => {
                 </div>
               )}
 
-              <div className="p-2.5 rounded-xl bg-atlas-elevated border border-atlas-border text-[11px] space-y-1">
-                <span className="text-atlas-cyan font-bold block">Pre-configured Demo Credentials:</span>
-                <div className="flex justify-between text-atlas-textMuted">
-                  <span>Role: Reviewer</span>
-                  <span className="font-mono text-atlas-textPrimary">reviewer / ReviewerPass2026!</span>
-                </div>
-                <div className="flex justify-between text-atlas-textMuted">
-                  <span>Role: Admin</span>
-                  <span className="font-mono text-atlas-textPrimary">admin / AdminPass2026!</span>
-                </div>
+              <div className="p-2.5 rounded-xl bg-atlas-elevated border border-atlas-border text-[11px] text-atlas-textMuted space-y-1">
+                <span className="text-atlas-cyan font-bold block">Institutional Access Control:</span>
+                <p>Authorized reviewer and administrator accounts are provisioned securely via host environment secrets.</p>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">

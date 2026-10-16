@@ -239,6 +239,34 @@ def test_auth_me_unauthenticated_defaults_to_guest():
     assert data["authenticated"] is False
 
 
+def test_argon2id_kdf_hashing():
+    from app.database import hash_password, verify_password
+    pwd = "TestSecurePassword2026!"
+    h, _ = hash_password(pwd)
+    # Check that Argon2id RFC 9106 format is generated
+    assert h.startswith("$argon2id$")
+    assert verify_password(pwd, h) is True
+    assert verify_password("WrongPassword!", h) is False
+
+
+def test_env_administrator_provisioning(monkeypatch):
+    from app.database import init_db
+    monkeypatch.setenv("ADMIN_USERNAME", "superadmin")
+    monkeypatch.setenv("ADMIN_PASSWORD", "SuperAdminPass2026!")
+    init_db()
+
+    # Verify that the provisioned admin can log in
+    resp = client.post("/api/auth/login", json={
+        "username": "superadmin",
+        "password": "SuperAdminPass2026!"
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["username"] == "superadmin"
+    assert data["role"] == "admin"
+
+
+
 def test_reviews_list_and_filter():
     resp = client.get("/api/reviews?limit=10&offset=0")
     assert resp.status_code == 200
