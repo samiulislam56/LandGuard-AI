@@ -26,7 +26,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
   const isBn = i18n.language === 'bn';
 
   const navItems = [
-    { label: isBn ? "হোমপেজ" : "Home", path: '/', icon: Home },
+    { label: isBn ? "হোমপেজ" : "Home", path: '/home', icon: Home },
     { label: isBn ? "জমি খুঁজুন" : "Land Search", path: '/search', icon: Search },
     { label: isBn ? "খসড়া ম্যাপ" : "Khasra Map", path: '/khasra-map', icon: Compass },
     { label: isBn ? "RMD অডিট" : "RMD Audit", path: '/rmd', icon: Scale },

@@ -27,7 +27,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
   const isBn = i18n.language === 'bn';
 
   const navItems = [
-    { label: isBn ? "হোমপেজ" : "Home", path: '/', icon: Home },
+    { label: isBn ? "হোমপেজ" : "Home", path: '/home', icon: Home },
     { label: isBn ? "জমি খুঁজুন" : "Land Search", path: '/search', icon: Search, isHighlight: true },
     { label: isBn ? "খসড়া ম্যাপ" : "Khasra Map", path: '/khasra-map', icon: Compass, isHighlight: true },
     { label: isBn ? "RMD অডিট" : "RMD Audit", path: '/rmd', icon: Scale, isHighlight: true },

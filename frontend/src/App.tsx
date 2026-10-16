@@ -32,14 +32,29 @@ const queryClient = new QueryClient({
   },
 });
 
+const RootHandler: React.FC = () => {
+  const hasEntered = typeof window !== 'undefined' && localStorage.getItem('landguard_has_entered') === 'true';
+  if (!hasEntered) {
+    return <Navigate to="/welcome" replace />;
+  }
+  return <HomePage />;
+};
+
 export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <BrowserRouter>
           <Routes>
+            {/* Standalone Full-Screen Login & Onboarding (Matching user screenshot) */}
+            <Route path="/welcome" element={<LoginPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<LoginPage />} />
+
+            {/* Main Application with Greenfield Layout */}
             <Route path="/" element={<Layout />}>
-              <Route index element={<HomePage />} />
+              <Route index element={<RootHandler />} />
+              <Route path="home" element={<HomePage />} />
               <Route path="search" element={<SearchPage />} />
               <Route path="khasra-map" element={<KhasraMapPage />} />
               <Route path="rmd" element={<RMDPage />} />
@@ -55,8 +70,6 @@ export const App: React.FC = () => {
               <Route path="review-cases" element={<ReviewQueuePage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="settings" element={<SettingsPage />} />
-              <Route path="login" element={<LoginPage />} />
-              <Route path="signup" element={<LoginPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
