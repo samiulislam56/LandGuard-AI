@@ -73,3 +73,9 @@ When attempting to register a new account on the user onboarding page, the appli
   - `test_registration_password_mismatch`: **PASSED** (HTTP 422 Unprocessable Content).
   - `test_registration_reserved_username_rejected`: **PASSED** (HTTP 403 Forbidden for admin/reviewer).
   - `test_registered_viewer_user_cannot_mutate_reviews`: **PASSED** (HTTP 403 Forbidden on protected review mutations).
+
+- Live Production Backend Verification (`https://landguard-ai-backend-y2q3.onrender.com`):
+  - `POST /api/auth/register`: Verified live, returned HTTP 201 Created.
+  - `POST /api/auth/demo`: Verified live, returned HTTP 200 OK.
+  - OpenAPI schema confirmed live with endpoints: `['/api/auth/register', '/api/auth/login', '/api/auth/demo', '/api/auth/logout', '/api/auth/me']`.
+  - GitHub Actions Workflow: **PASSED (Success)** on commit `c2f8953`.

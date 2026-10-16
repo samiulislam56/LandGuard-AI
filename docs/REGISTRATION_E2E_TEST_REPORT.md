@@ -72,5 +72,8 @@ tests/test_api.py::test_registered_viewer_user_cannot_mutate_reviews PASSED [100
 ## 3. Frontend Quality Gates
 
 - **`npm run typecheck`**: **0 errors** (`tsc --noEmit` passed).
+- **`npm run lint`**: **0 errors, 0 warnings** (`eslint src` passed).
 - **`npm run build`**: Production bundle created cleanly in `dist/`.
 - **Localization**: Verified in both Bengali (`বাংলা`) and English (`en`).
+- **CI/CD Pipeline**: GitHub Actions Run `38948459483` (commit `c2f8953`) **PASSED (Success)** on both Backend Quality and Frontend Quality jobs.
+- **Production Verification**: Live Render backend verified with `POST /api/auth/register` (201 Created) and `POST /api/auth/demo` (200 OK).
