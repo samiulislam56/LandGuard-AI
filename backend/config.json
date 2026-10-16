@@ -1,0 +1,24 @@
+{
+  "project": "LandGuard AI",
+  "backend_version": "0.1.0",
+  "data_origin": "SYNTHETIC",
+  "default_assessment_date": "2026-10-15",
+  "model_files": [
+    "landguard_rf_baseline_v1.joblib",
+    "landguard_isolation_forest_v1.joblib"
+  ],
+  "data_files": [
+    "parcels.csv",
+    "ownership.csv",
+    "transactions.csv",
+    "mutations.csv",
+    "review_cases.csv"
+  ],
+  "statuses": [
+    "NO_REVIEW_FLAG_DETECTED",
+    "REVIEW_REQUIRED",
+    "INSUFFICIENT_EVIDENCE",
+    "PENDING_DATE_VERIFICATION"
+  ],
+  "anomaly_policy": "Anomaly detection is supplementary only. It must not independently establish fraud."
+}
