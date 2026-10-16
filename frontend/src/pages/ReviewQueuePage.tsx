@@ -16,7 +16,8 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { ReviewCase, UserProfile } from '../types/api';
@@ -622,23 +623,39 @@ export const ReviewQueuePage: React.FC = () => {
                 <p>Authorized reviewer and administrator accounts are provisioned securely via host environment secrets.</p>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-between gap-2 pt-2">
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  onClick={() => setShowLoginModal(false)}
+                  className="text-emerald-700 dark:text-emerald-300 border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/60"
+                  onClick={async () => {
+                    await api.demoLogin();
+                    setShowLoginModal(false);
+                    refetchUser();
+                  }}
                 >
-                  Cancel
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500 mr-1" />
+                  <span>সরাসরি ডেমো প্রবেশ</span>
                 </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="sm"
-                  isLoading={loginMutation.isPending}
-                >
-                  Sign In
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowLoginModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    isLoading={loginMutation.isPending}
+                  >
+                    Sign In
+                  </Button>
+                </div>
               </div>
             </form>
           </div>

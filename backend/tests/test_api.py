@@ -380,3 +380,14 @@ def test_rmd_parcel_endpoint():
     assert len(data2["audits"]) == 3
 
 
+def test_direct_demo_auth_endpoint():
+    resp = client.post("/api/auth/demo")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["username"] == "demo_guest"
+    assert data["role"] == "viewer"
+    assert "token" in data
+    assert len(data["token"]) > 20
+
+
+

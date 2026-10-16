@@ -6,8 +6,8 @@ import {
   Moon,
   Sun,
   Menu,
-  ShieldCheck,
-  Languages
+  Languages,
+  Sparkles
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { setLanguage } from '../../i18n';
@@ -94,13 +94,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
         </div>
       </form>
 
-      {/* Right: Guest Demo Badge, Language, Theme, Quick Shortcuts */}
+      {/* Right: Guest Demo / Login Link, Language, Theme, Quick Shortcuts */}
       <div className="flex items-center gap-2">
-        {/* Guest Demo Badge */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-medium">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>{currentLang === 'bn' ? "অতিথি ডেমো" : "Guest Demo"}</span>
-        </div>
+        {/* Direct Demo / Login Link */}
+        <Link
+          to="/login"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 border border-emerald-300 dark:border-emerald-700/80 text-emerald-800 dark:text-emerald-300 text-xs font-bold transition-all shadow-sm"
+          title={currentLang === 'bn' ? "লগইন বা সরাসরি ডেমো প্রবেশ" : "Sign In or Direct Demo Access"}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+          <span>{currentLang === 'bn' ? "লগইন / ডেমো" : "Login / Demo"}</span>
+        </Link>
 
         {/* Language Switcher */}
         <button

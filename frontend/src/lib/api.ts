@@ -153,6 +153,28 @@ export const api = {
     return res;
   },
 
+  demoLogin: async (): Promise<LoginResponse> => {
+    try {
+      const res = await request<LoginResponse>('/api/auth/demo', {
+        method: 'POST'
+      });
+      if (res.token) {
+        authStorage.setToken(res.token);
+      }
+      return res;
+    } catch {
+      // Fallback: set local guest token without failing
+      const fallback: LoginResponse = {
+        token: 'demo_guest_token_' + Date.now(),
+        username: 'demo_guest',
+        role: 'viewer',
+        expires_at: new Date(Date.now() + 86400000).toISOString()
+      };
+      authStorage.setToken(fallback.token);
+      return fallback;
+    }
+  },
+
   logout: async (): Promise<void> => {
     try {
       await request<{ status: string }>('/api/auth/logout', { method: 'POST' });

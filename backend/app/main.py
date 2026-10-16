@@ -21,6 +21,7 @@ from .auth import (
     LoginResponse,
     UserProfile,
     authenticate_user,
+    create_session,
     invalidate_session,
     get_current_user,
     require_role,
@@ -553,6 +554,12 @@ def login_endpoint(credentials: LoginRequest):
             detail="Invalid username or password. Valid demo users: 'reviewer' or 'admin'."
         )
     return session
+
+
+@app.post("/api/auth/demo", response_model=LoginResponse)
+def demo_login_endpoint():
+    """Generates an authorized demo guest session for immediate 1-click exploration without credentials."""
+    return create_session("demo_guest", "viewer")
 
 
 @app.post("/api/auth/logout")

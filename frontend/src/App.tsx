@@ -19,6 +19,7 @@ import { ReviewQueuePage } from './pages/ReviewQueuePage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { Explorer3DPage } from './pages/Explorer3DPage';
+import { LoginPage } from './pages/LoginPage';
 
 // Configure TanStack Query Client
 const queryClient = new QueryClient({
@@ -54,6 +55,8 @@ export const App: React.FC = () => {
               <Route path="review-cases" element={<ReviewQueuePage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="signup" element={<LoginPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
