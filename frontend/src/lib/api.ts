@@ -16,7 +16,9 @@ import {
   ReviewListResponse,
   ReviewQueryFilters,
   ReviewUpdateRequest,
-  ReviewAuditLog
+  ReviewAuditLog,
+  RMDAuditResponse,
+  RMDParcelResponse
 } from '../types/api';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/+$/, '');
@@ -219,5 +221,16 @@ export const api = {
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(blobUrl);
+  },
+
+  // -------------------------------------------------------------------------
+  // RMD (Record Mutation Deed / Discrepancy) Triangulation Audit
+  // -------------------------------------------------------------------------
+  getRMDAudit: async (transactionId: string): Promise<RMDAuditResponse> => {
+    return request<RMDAuditResponse>(`/api/rmd/audit/${encodeURIComponent(transactionId)}`);
+  },
+
+  getRMDParcel: async (parcelId: string): Promise<RMDParcelResponse> => {
+    return request<RMDParcelResponse>(`/api/rmd/parcel/${encodeURIComponent(parcelId)}`);
   }
 };

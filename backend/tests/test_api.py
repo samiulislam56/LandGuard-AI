@@ -343,3 +343,40 @@ def test_download_pdf_report_endpoint():
     assert resp.content.startswith(b"%PDF-")
     assert len(resp.content) > 1000
 
+
+# ---------------------------------------------------------------------------
+# RMD TRIANGULATION AUDIT TESTS
+# ---------------------------------------------------------------------------
+def test_rmd_audit_endpoint():
+    # Test ground truth transaction TX-002911-2 (flagged scenario)
+    resp = client.get("/api/rmd/audit/TX-002911-2")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["transaction_id"] == "TX-002911-2"
+    assert data["parcel_id"] in ["LG-P-002911", "PARCEL-002911"]
+    assert "rmd_status" in data
+    assert "rmd_status_bn" in data
+    assert "pillars" in data
+    assert "khatian" in data["pillars"]
+    assert "mutation" in data["pillars"]
+    assert "deed" in data["pillars"]
+    assert "discrepancies" in data
+    assert "recommendation_bn" in data
+
+
+def test_rmd_parcel_endpoint():
+    # Test with both LG-P- and PARCEL- prefixes
+    resp1 = client.get("/api/rmd/parcel/LG-P-002911")
+    assert resp1.status_code == 200
+    data1 = resp1.json()
+    assert data1["parcel_id"] == "LG-P-002911"
+    assert "audits" in data1
+    assert len(data1["audits"]) == 3
+    assert "overall_rmd_health" in data1
+
+    resp2 = client.get("/api/rmd/parcel/PARCEL-002911")
+    assert resp2.status_code == 200
+    data2 = resp2.json()
+    assert len(data2["audits"]) == 3
+
+

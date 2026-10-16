@@ -5,15 +5,19 @@ import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
 import { MagnificationDock } from './MagnificationDock';
+import { AICopilotModal } from '../copilot/AICopilotModal';
 
 export const Layout: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex flex-col min-h-screen bg-atlas-app text-atlas-textPrimary font-sans selection:bg-atlas-cyan selection:text-slate-950 transition-colors">
+    <div className="flex flex-col min-h-screen bg-[#FBFBF9] dark:bg-[#0B130E] text-slate-800 dark:text-slate-100 font-sans selection:bg-emerald-600 selection:text-white transition-colors">
       {/* Top Accessible Disclaimer */}
       <DisclaimerBanner />
+
+      {/* Floating AI Copilot Assistant */}
+      <AICopilotModal />
 
       {/* Main App Container */}
       <div className="flex flex-1 overflow-hidden relative">

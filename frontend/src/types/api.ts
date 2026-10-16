@@ -169,3 +169,75 @@ export interface ReviewUpdateRequest {
   notes?: string;
   assigned_reviewer?: string;
 }
+
+// ---------------------------------------------------------------------------
+// RMD (Record Mutation Deed / Discrepancy) Interfaces
+// ---------------------------------------------------------------------------
+export interface RMDPillarKhatian {
+  khatian_no?: string;
+  dag_no?: string;
+  district?: string;
+  upazila?: string;
+  mouza?: string;
+  jl_no?: string;
+  total_area_acres?: number;
+  recorded_owners: string[];
+  status: string;
+}
+
+export interface RMDPillarDeed {
+  transaction_id: string;
+  transaction_date: string;
+  seller_alias: string;
+  buyer_alias: string;
+  sale_area_acres: number;
+  registered: boolean;
+  claimed_share?: number;
+}
+
+export interface RMDPillarMutation {
+  records_count: number;
+  records: Array<{
+    mutation_id?: string;
+    transaction_id?: string;
+    parcel_id?: string;
+    record_consistency?: string;
+    status?: string;
+  }>;
+  has_mutation: boolean;
+  consistency: string;
+}
+
+export interface RMDDiscrepancy {
+  code: string;
+  pillar: string;
+  message_en: string;
+  message_bn: string;
+}
+
+export interface RMDAuditResponse {
+  transaction_id: string;
+  parcel_id: string;
+  audit_timestamp: string;
+  rmd_status: 'RMD_ALIGNED' | 'RMD_CHAIN_DISCREPANCY' | 'RMD_MUTATION_MISSING' | 'RMD_AREA_OVERCLAIM' | 'RMD_UNRESOLVED_TRANSFER';
+  rmd_status_bn: string;
+  risk_severity: 'LOW' | 'MEDIUM' | 'HIGH';
+  recommendation_bn: string;
+  discrepancies: RMDDiscrepancy[];
+  pillars: {
+    khatian: RMDPillarKhatian;
+    deed: RMDPillarDeed;
+    mutation: RMDPillarMutation;
+  };
+  disclaimer: string;
+}
+
+export interface RMDParcelResponse {
+  parcel_id: string;
+  parcel_meta: Record<string, any>;
+  transactions_count: number;
+  overall_rmd_health: 'DISCREPANCIES_DETECTED' | 'ALIGNED_OR_REVIEW';
+  audits: RMDAuditResponse[];
+  disclaimer: string;
+}
+

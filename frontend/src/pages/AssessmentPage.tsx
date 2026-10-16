@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -14,6 +14,8 @@ import {
   AlertOctagon,
   CheckCircle2,
   Download,
+  Scale,
+  SlidersHorizontal,
 } from 'lucide-react';
 
 import { api } from '../lib/api';
@@ -25,11 +27,13 @@ import { ErrorState } from '../components/ui/ErrorState';
 export const AssessmentPage: React.FC = () => {
   const { id = 'TX-002911-2' } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isBn = i18n.language === 'bn';
 
   const [asOfDate, setAsOfDate] = useState('2026-10-15');
   const [targetId, setTargetId] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [experienceMode, setExperienceMode] = useState<'simple' | 'advanced'>('simple');
 
   const {
     data: assessment,
@@ -172,6 +176,41 @@ export const AssessmentPage: React.FC = () => {
         </button>
       </div>
 
+      {/* Experience Mode Toggle (সহজ মোড vs বিস্তারিত মোড) */}
+      <div className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal className="w-4 h-4 text-emerald-600" />
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            {isBn ? "প্রদর্শন মোড নির্বাচন:" : "Select Experience Mode:"}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-100 dark:bg-slate-700">
+          <button
+            type="button"
+            onClick={() => setExperienceMode('simple')}
+            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+              experienceMode === 'simple'
+                ? 'bg-emerald-700 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+            }`}
+          >
+            {isBn ? "সহজ মোড (নাগরিক)" : "Simple Mode"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setExperienceMode('advanced')}
+            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+              experienceMode === 'advanced'
+                ? 'bg-emerald-700 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+            }`}
+          >
+            {isBn ? "বিস্তারিত মোড (বিশ্লেষক)" : "Advanced Mode"}
+          </button>
+        </div>
+      </div>
+
       {isError ? (
         <ErrorState
           title="Assessment Computation Failed"
@@ -180,64 +219,152 @@ export const AssessmentPage: React.FC = () => {
         />
       ) : (
         <>
-          {/* Top Status Hero Banner */}
-          <div className="rounded-2xl border border-atlas-border bg-atlas-surface p-5 shadow-atlas-md">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-atlas-textMuted block">
-                  Hierarchical Policy Screening Result
-                </span>
-                <div className="flex items-center gap-3 mt-1.5">
-                  {isLoading ? (
-                    <Skeleton className="h-8 w-48" />
-                  ) : (
-                    <Badge variant={getStatusBadgeVariant(finalStatus)} size="md" className="text-sm px-4 py-1.5 font-bold font-mono">
-                      {finalStatus.replace(/_/g, ' ')}
-                    </Badge>
-                  )}
-                  {assessment?.human_review_recommended && (
-                    <span className="text-xs font-semibold text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
-                      Human Review Recommended
-                    </span>
-                  )}
+          {/* Simple Mode Citizen Card */}
+          {experienceMode === 'simple' && (
+            <div className="p-6 rounded-2xl border bg-white dark:bg-slate-800 border-emerald-800/20 shadow-md space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                    {isBn ? "সহজ মূল্যায়ন ফলাফল" : "Plain-Language Assessment"}
+                  </span>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                    {finalStatus === 'REVIEW_REQUIRED'
+                      ? (isBn ? "পর্যালোচনা প্রয়োজন (সতর্কতা)" : "Review Required")
+                      : finalStatus === 'INSUFFICIENT_EVIDENCE'
+                      ? (isBn ? "তথ্য অসম্পূর্ণ" : "Insufficient Evidence")
+                      : finalStatus === 'PENDING_DATE_VERIFICATION'
+                      ? (isBn ? "তারিখ যাচাই প্রয়োজন" : "Pending Date Verification")
+                      : (isBn ? "কোনো দৃশ্যমান অসংগতি পাওয়া যায়নি" : "Clean Record")}
+                  </h2>
                 </div>
-                <p className="text-xs text-atlas-textMuted mt-2 font-mono">
-                  Parcel Reference:{' '}
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/parcels/${assessment?.parcel_id}`)}
-                    className="text-atlas-cyan font-bold underline hover:opacity-80"
-                  >
-                    {assessment?.parcel_id}
-                  </button>{' '}
-                  &bull; Assessment Date: {assessment?.assessment_date}
-                </p>
+                <Badge variant={getStatusBadgeVariant(finalStatus)} size="md" className="text-sm px-3.5 py-1 font-bold">
+                  {finalStatus}
+                </Badge>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate(`/transactions/${id}`)}
-                  leftIcon={<FileCheck2 className="w-3.5 h-3.5" />}
-                  className="text-xs font-mono"
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
+                {finalStatus === 'REVIEW_REQUIRED' ? (
+                  <p>
+                    {isBn 
+                      ? "এই দলিলের বিক্রেতার সাথে খতিয়ানের পূর্বতন মালিকানার মিল পাওয়া যায়নি অথবা নামজারি নথির অসংগতি রয়েছে। জমি ক্রয়ের পূর্বে সহকারী কমিশনার (ভূমি) অফিস বা সাব-রেজিস্ট্রার কার্যালয় থেকে বায়া দলিল যাচাই করার পরামর্শ দেওয়া হচ্ছে।"
+                      : "The seller named in this deed does not match recorded ownership history, or mutation records show inconsistencies. Prior deed verification is strongly recommended."}
+                  </p>
+                ) : finalStatus === 'INSUFFICIENT_EVIDENCE' ? (
+                  <p>
+                    {isBn 
+                      ? "লেনদেনের প্রয়োজনীয় সহায়ক নথিপত্র এবং রেকর্ডীয় তথ্য অসম্পূর্ণ থাকায় চূড়ান্ত স্ক্রিনিং সম্ভব হয়নি।"
+                      : "Supporting documents and recorded ownership lineage are incomplete. Further records are required."}
+                  </p>
+                ) : finalStatus === 'PENDING_DATE_VERIFICATION' ? (
+                  <p>
+                    {isBn 
+                      ? "মূল্যায়ন তারিখের তুলনায় দলিলের তারিখ ভবিষ্যৎ সময় নির্দেশ করছে। তারিখ যাচাই প্রয়োজন।"
+                      : "Transaction date is recorded as posterior to the current assessment reference date."}
+                  </p>
+                ) : (
+                  <p>
+                    {isBn 
+                      ? "প্রাথমিক পর্যালোচনায় এই লেনদেনের ক্ষেত্রে কোনো প্রকাশ্য দ্বৈত-বিক্রয় সংকেত বা মালিকানা অসংগতি পরিলক্ষিত হয়নি।"
+                      : "No conflicting double-selling flags or title ownership mismatches were identified."}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <Link to={`/rmd?tx=${id}`}>
+                  <Button variant="primary" size="sm" className="gap-2 bg-emerald-700 hover:bg-emerald-800">
+                    <Scale className="w-4 h-4" />
+                    {isBn ? "RMD ধারাবাহিকতা অডিট দেখুন" : "View RMD Triangulation"}
+                  </Button>
+                </Link>
+                <Link to={`/parcels/${assessment?.parcel_id}`}>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Layers className="w-4 h-4" />
+                    {isBn ? "জমির ইতিহাস দেখুন" : "View Parcel History"}
+                  </Button>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setExperienceMode('advanced')}
+                  className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-semibold ml-auto"
                 >
-                  View Deed Record
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate(`/parcels/${assessment?.parcel_id}`)}
-                  leftIcon={<Layers className="w-3.5 h-3.5" />}
-                  className="text-xs font-mono"
-                >
-                  Parcel History
-                </Button>
+                  {isBn ? "প্রযুক্তিগত বিস্তারিত বিশ্লেষণ দেখুন &rarr;" : "View Technical Analysis &rarr;"}
+                </button>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Model Inference & Findings Grid */}
+          {/* Top Status Hero Banner (Always visible in Advanced Mode) */}
+          {experienceMode === 'advanced' && (
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 block">
+                    Hierarchical Policy Screening Result
+                  </span>
+                  <div className="flex items-center gap-3 mt-1.5">
+                    {isLoading ? (
+                      <Skeleton className="h-8 w-48" />
+                    ) : (
+                      <Badge variant={getStatusBadgeVariant(finalStatus)} size="md" className="text-sm px-4 py-1.5 font-bold font-mono">
+                        {finalStatus.replace(/_/g, ' ')}
+                      </Badge>
+                    )}
+                    {assessment?.human_review_recommended && (
+                      <span className="text-xs font-semibold text-rose-500 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">
+                        Human Review Recommended
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2 font-mono">
+                    Parcel Reference:{' '}
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/parcels/${assessment?.parcel_id}`)}
+                      className="text-emerald-700 dark:text-emerald-400 font-bold underline hover:opacity-80"
+                    >
+                      {assessment?.parcel_id}
+                    </button>{' '}
+                    &bull; Assessment Date: {assessment?.assessment_date}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <Link to={`/rmd?tx=${id}`}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs font-mono gap-1.5 border-emerald-300 text-emerald-800 dark:text-emerald-300"
+                    >
+                      <Scale className="w-3.5 h-3.5" />
+                      RMD Audit
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/transactions/${id}`)}
+                    leftIcon={<FileCheck2 className="w-3.5 h-3.5" />}
+                    className="text-xs font-mono"
+                  >
+                    View Deed Record
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/parcels/${assessment?.parcel_id}`)}
+                    leftIcon={<Layers className="w-3.5 h-3.5" />}
+                    className="text-xs font-mono"
+                  >
+                    Parcel History
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Model Inference & Findings Grid (Advanced Mode) */}
+          {experienceMode === 'advanced' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             {/* Left 6 cols: Dual Model Evaluation Panel */}
             <div className="lg:col-span-6 space-y-4">
@@ -358,6 +485,7 @@ export const AssessmentPage: React.FC = () => {
               </div>
             </div>
           </div>
+          )}
         </>
       )}
     </div>

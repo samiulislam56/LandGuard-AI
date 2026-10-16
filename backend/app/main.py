@@ -773,3 +773,188 @@ def download_assessment_report(
         }
     )
 
+
+# ---------------------------------------------------------------------------
+# 14. Domain Module: RMD (Record Mutation Deed / Discrepancy Triangulation)
+# ---------------------------------------------------------------------------
+@app.get("/api/rmd/audit/{transaction_id}")
+def get_rmd_audit_endpoint(transaction_id: str):
+    """
+    RMD Triangulation Audit:
+    Audits cross-consistency between the three foundational pillars of land records:
+    1. Record of Rights (Khatian / RoR) from parcels.csv & ownership.csv
+    2. Mutation (Namjari / Khariz) from mutations.csv
+    3. Registered Deed (Dalil / Sub-Registry) from transactions.csv
+    """
+    tables, _, _ = resources()
+    tx_row = get_record(tables["transactions"], "transaction_id", transaction_id)
+    tx = clean(tx_row.to_dict())
+
+    parcel_id = tx["parcel_id"]
+    parcel_row = get_record(tables["parcels"], "parcel_id", parcel_id)
+    parcel = clean(parcel_row.to_dict())
+
+    # 1. Khatian (Record of Rights) Pillar
+    ownership_df = tables["ownership"]
+    owners_matches = ownership_df[ownership_df["parcel_id"] == parcel_id]
+    owners_list = [clean(r) for r in owners_matches.to_dict(orient="records")]
+    recorded_owner_aliases = [o["person_alias"] for o in owners_list]
+
+    # 2. Mutation (Namjari) Pillar
+    mutations_df = tables["mutations"]
+    mut_matches = mutations_df[
+        (mutations_df["transaction_id"] == transaction_id) | 
+        (mutations_df["parcel_id"] == parcel_id)
+    ]
+    mutations_list = [clean(r) for r in mut_matches.to_dict(orient="records")]
+
+    # 3. Discrepancy Triangulation Logic
+    discrepancies = []
+    seller_alias = tx.get("seller_alias", "")
+    seller_mismatch = bool(tx.get("seller_owner_mismatch", 0)) or (
+        len(recorded_owner_aliases) > 0 and seller_alias not in recorded_owner_aliases
+    )
+    mutation_mismatch = bool(tx.get("mutation_mismatch", 0)) or len(mutations_list) == 0
+    area_mismatch = bool(tx.get("area_mismatch", 0))
+    prior_conflict = bool(tx.get("prior_transaction_exists", 0)) and not bool(tx.get("legitimate_resale_evidence", 0))
+
+    if seller_mismatch:
+        discrepancies.append({
+            "code": "RMD_SELLER_NOT_IN_KHATIAN",
+            "pillar": "RECORD_VS_DEED",
+            "message_en": f"Seller alias '{seller_alias}' does not match recorded Khatian owner.",
+            "message_bn": f"দলিলে উল্লিখিত বিক্রেতা '{seller_alias}' খতিয়ানের রেকর্ডীয় মালিকদের সাথে মেলেনি।"
+        })
+
+    if mutation_mismatch:
+        discrepancies.append({
+            "code": "RMD_MUTATION_MISSING_OR_FLAGGED",
+            "pillar": "DEED_VS_MUTATION",
+            "message_en": "Mutation record is either absent or flagged with consistency mismatch.",
+            "message_bn": "নামজারি (খারিজ) খতিয়ান অনুপস্থিত অথবা নামজারি রেকর্ডে গরমিল পরিলক্ষিত হয়েছে।"
+        })
+
+    if area_mismatch:
+        discrepancies.append({
+            "code": "RMD_AREA_OVERCLAIM",
+            "pillar": "DEED_VS_RECORD",
+            "message_en": "Transferred area exceeds the recorded fractional ownership share.",
+            "message_bn": "হস্তান্তরিত জমির পরিমাণ খতিয়ানে উল্লিখিত মালিকানার অংশের চেয়ে বেশি।"
+        })
+
+    if prior_conflict:
+        discrepancies.append({
+            "code": "RMD_PRIOR_DEED_CONFLICT",
+            "pillar": "CHAIN_OF_TITLE",
+            "message_en": "Prior transaction exists without verified legitimate resale lineage.",
+            "message_bn": "পূর্ববর্তী হস্তান্তরের অস্তিত্ব রয়েছে কিন্তু ধারাবাহিক বায়া দলিলের প্রমাণ পাওয়া যায়নি।"
+        })
+
+    # Status Determination
+    if seller_mismatch:
+        status_code = "RMD_CHAIN_DISCREPANCY"
+        status_bn = "মালিকানা ধারাবাহিকতায় অসংগতি (খতিয়ান বনাম দলিল)"
+        severity = "HIGH"
+        recommendation_bn = "সহকারী কমিশনার (ভূমি) বা সাব-রেজিস্ট্রার কার্যালয় থেকে মূল বায়া দলিল ও নামজারি পর্চা যাচাই করা আবশ্যক।"
+    elif mutation_mismatch:
+        status_code = "RMD_MUTATION_MISSING"
+        status_bn = "নামজারি নথিতে অসংগতি বা নামজারি রেকর্ড অনুপস্থিত"
+        severity = "MEDIUM"
+        recommendation_bn = "অনলাইন ই-নামজারি পোর্টালে খারিজের হালনাগাদ আবেদন ও ডিসিআর যাচাই করুন।"
+    elif area_mismatch:
+        status_code = "RMD_AREA_OVERCLAIM"
+        status_bn = "দলিলের জমির পরিমাণ রেকর্ডীয় অংশের চেয়ে বেশি"
+        severity = "HIGH"
+        recommendation_bn = "সিএস/এসএ/আরএস জরিপের দাগের মোট জমির হিস্যা পুনর্বিবেচনা করুন।"
+    elif prior_conflict:
+        status_code = "RMD_UNRESOLVED_TRANSFER"
+        status_bn = "পূর্ববর্তী হস্তান্তরের বিরোধ বা প্রমাণ অসম্পূর্ণ"
+        severity = "MEDIUM"
+        recommendation_bn = "পূর্ববর্তী ক্রেতা ও বিক্রেতার রেজিস্ট্রি দলিলের বায়া রেকর্ড অনুসন্ধান করুন।"
+    else:
+        status_code = "RMD_ALIGNED"
+        status_bn = "খতিয়ান, নামজারি ও দলিলের তথ্য সামঞ্জস্যপূর্ণ"
+        severity = "LOW"
+        recommendation_bn = "তিনটি স্তরের নথির মধ্যে মৌলিক কোনো অসংগতি পাওয়া যায়নি।"
+
+    return clean({
+        "transaction_id": transaction_id,
+        "parcel_id": parcel_id,
+        "audit_timestamp": datetime.now(timezone.utc).isoformat(),
+        "rmd_status": status_code,
+        "rmd_status_bn": status_bn,
+        "risk_severity": severity,
+        "recommendation_bn": recommendation_bn,
+        "discrepancies": discrepancies,
+        "pillars": {
+            "khatian": {
+                "khatian_no": parcel.get("khatian_no"),
+                "dag_no": parcel.get("dag_no"),
+                "district": parcel.get("district"),
+                "upazila": parcel.get("upazila"),
+                "mouza": parcel.get("mouza"),
+                "jl_no": parcel.get("jl_no"),
+                "total_area_acres": parcel.get("total_area_acres"),
+                "recorded_owners": recorded_owner_aliases,
+                "status": "RECORD_LOADED"
+            },
+            "deed": {
+                "transaction_id": transaction_id,
+                "transaction_date": tx.get("transaction_date"),
+                "seller_alias": tx.get("seller_alias"),
+                "buyer_alias": tx.get("buyer_alias"),
+                "sale_area_acres": tx.get("sale_area_acres"),
+                "registered": bool(tx.get("registered", 0)),
+                "claimed_share": tx.get("claimed_share")
+            },
+            "mutation": {
+                "records_count": len(mutations_list),
+                "records": mutations_list,
+                "has_mutation": len(mutations_list) > 0,
+                "consistency": "CONSISTENT" if not mutation_mismatch else "DISCREPANCY_OR_ABSENT"
+            }
+        },
+        "disclaimer": "সিন্থেটিক ডেটা প্রদর্শন। এটি কোনো সরকারি রেকর্ড পরিবর্তন বা আইনি স্বত্ব সনদ নয়।"
+    })
+
+
+@app.get("/api/rmd/parcel/{parcel_id}")
+def get_rmd_parcel_endpoint(parcel_id: str):
+    """Returns the RMD triangulation audit across all transactions of a parcel."""
+    tables, _, _ = resources()
+    target_id = parcel_id
+    if target_id not in tables["parcels"]["parcel_id"].values:
+        if target_id.startswith("PARCEL-"):
+            alt_id = target_id.replace("PARCEL-", "LG-P-")
+            if alt_id in tables["parcels"]["parcel_id"].values:
+                target_id = alt_id
+        elif target_id.startswith("LG-P-"):
+            alt_id = target_id.replace("LG-P-", "PARCEL-")
+            if alt_id in tables["parcels"]["parcel_id"].values:
+                target_id = alt_id
+
+    parcel_row = get_record(tables["parcels"], "parcel_id", target_id)
+    parcel = clean(parcel_row.to_dict())
+
+    tx_df = tables["transactions"]
+    tx_matches = tx_df[tx_df["parcel_id"] == target_id].sort_values("transaction_date")
+    tx_list = [clean(r) for r in tx_matches.to_dict(orient="records")]
+
+    audits = []
+    has_high_risk = False
+    for tx in tx_list:
+        audit = get_rmd_audit_endpoint(tx["transaction_id"])
+        if audit["risk_severity"] == "HIGH":
+            has_high_risk = True
+        audits.append(audit)
+
+    return clean({
+        "parcel_id": parcel_id,
+        "parcel_meta": parcel,
+        "transactions_count": len(tx_list),
+        "overall_rmd_health": "DISCREPANCIES_DETECTED" if has_high_risk else "ALIGNED_OR_REVIEW",
+        "audits": audits,
+        "disclaimer": "সিন্থেটিক ডেটা প্রদর্শন। সরকারি আইনি যাচাই নয়।"
+    })
+
+

@@ -4,7 +4,7 @@ import { initReactI18next } from 'react-i18next';
 import en from './locales/en.json';
 import bn from './locales/bn.json';
 
-const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('landguard_language') || 'en' : 'en';
+const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('landguard_language') || 'bn' : 'bn';
 
 i18n
   .use(initReactI18next)
@@ -14,7 +14,7 @@ i18n
       bn: { translation: bn },
     },
     lng: savedLanguage,
-    fallbackLng: 'en',
+    fallbackLng: 'bn',
     interpolation: {
       escapeValue: false, // React already escapes values
     },

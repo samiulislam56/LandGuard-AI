@@ -5,6 +5,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './context/ThemeContext';
 import { Layout } from './components/layout/Layout';
 
+import { HomePage } from './pages/HomePage';
+import { SearchPage } from './pages/SearchPage';
+import { KhasraMapPage } from './pages/KhasraMapPage';
+import { RMDPage } from './pages/RMDPage';
+import { HelpGlossaryPage } from './pages/HelpGlossaryPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { TransactionsPage } from './pages/TransactionsPage';
 import { TransactionDetailPage } from './pages/TransactionDetailPage';
@@ -33,7 +38,12 @@ export const App: React.FC = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>
-              <Route index element={<DashboardPage />} />
+              <Route index element={<HomePage />} />
+              <Route path="search" element={<SearchPage />} />
+              <Route path="khasra-map" element={<KhasraMapPage />} />
+              <Route path="rmd" element={<RMDPage />} />
+              <Route path="help" element={<HelpGlossaryPage />} />
+              <Route path="dashboard" element={<DashboardPage />} />
               <Route path="explorer-3d" element={<Explorer3DPage />} />
               <Route path="transactions" element={<TransactionsPage />} />
               <Route path="transactions/:id" element={<TransactionDetailPage />} />

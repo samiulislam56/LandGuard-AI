@@ -1,29 +1,32 @@
-# LandGuard Atlas — Next-Generation Geo-Intelligence Command Center
-### Synthetic Land Transaction Intelligence & Potential Double-Selling Screening Platform for Bangladesh
+# LandGuard AI — স্মার্ট ভূমি তথ্য ও লেনদেন যাচাই সহায়ক
+### LandGuard Greenfield — Human-Friendly Digital Land Experience
+> *"জমির তথ্য বুঝুন, লেনদেনের অসংগতি যাচাই করুন।"*  
+> *"Understand Land Records. Screen Transaction Inconsistencies."*
 
 [![CI Quality Pipeline](https://github.com/samiulislam56/LandGuard-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/samiulislam56/LandGuard-AI/actions/workflows/ci.yml)
 [![FastAPI Backend](https://img.shields.io/badge/Backend-FastAPI%200.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React Frontend](https://img.shields.io/badge/Frontend-React%2018%20%2B%20TypeScript-61DAFB?logo=react&logoColor=black)](https://react.dev)
 [![Three.js](https://img.shields.io/badge/3D%20Engine-Three.js%20%2B%20R3F-black?logo=three.js&logoColor=white)](https://threejs.org)
 [![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind%20CSS-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Bilingual](https://img.shields.io/badge/i18n-English%20%7C%20বাংলা-20C7D4)](https://github.com/samiulislam56/LandGuard-AI)
+[![Bengali First](https://img.shields.io/badge/Language-বাংলা%20(Default)%20%7C%20English-20C7D4)](https://github.com/samiulislam56/LandGuard-AI)
 
 ---
 
-## 1. Overview & Problem Statement
+## 1. Overview & Vision
 
-Land records and conveyance deeds in Bangladesh frequently encounter disputes stemming from **duplicate sales, overlapping claims, inconsistent mutation records, and missing evidence chains**. 
+LandGuard AI is an approachable, inclusive, yet analytically rigorous land information and transaction screening platform tailored for Bangladesh. Built on human-centered design principles, it empowers citizens with limited digital literacy while offering comprehensive forensic evidence tools for land professionals, legal researchers, and authorized reviewers.
 
-**LandGuard Atlas** is an automated cadastral intelligence and transaction screening prototype designed to assist deed auditors, legal reviewers, and land registration officers with:
-1. Detecting competing and concurrent title claims across cadastral parcels (*Dag* & *Khatian* numbers).
-2. Quantifying multi-dimensional anomaly risk using a **dual-model machine learning architecture** (Random Forest Classifier + Isolation Forest Anomaly Detector).
-3. Verifying deterministic evidence rules including seller-owner mismatches, area bound discrepancies, mutation gaps, and deed document integrity hashes.
-4. Exploring historical land parcel ownership lineages in both **2D interactive GIS maps** and an interactive **3D Cadastral Parcel Explorer**.
-5. Delivering a fully localized **bilingual interface** supporting both **English** and **বাংলা (Bengali)**.
+### Core Experience Principles
+- **Simple outside, powerful inside**: Citizens navigate intuitive step-by-step land workflows without cognitive fatigue; experts expand deep forensic evidence on demand.
+- **Bengali-First Localization**: Opens natively in standard Bengali (`বাংলা`) by default with seamless toggle to English.
+- **Data-Centered Architecture**: Grounded in immutable synthetic records (3,000 parcels, 3,851 transactions) and trained Random Forest + Isolation Forest ML pipelines.
+- **RMD Triangulation (Record Mutation Deed)**: Auditing discrepancies across Record of Rights (Khatian), Mutation (Namjari), and Registered Deeds (Dalil).
+- **Grounded AI Copilot**: Accessible conversational assistant explaining land terminology and screening outcomes in clear, simple Bengali.
+- **Digital Khasra & Cadastral Visualization**: Schematic numbered plot layouts (Dag 101–108) with real geographic GIS map integration.
 
 > [!IMPORTANT]
-> **Synthetic Data & Legal Disclaimer:**
-> LandGuard AI operates exclusively on synthetic datasets generated for demonstration, testing, and research purposes. It does not contain actual personally identifiable information (PII) or official surveyed property boundaries. Machine learning scores and anomaly indicators highlight transaction patterns for human review and **do not constitute definitive legal proof of fraud or invalid title**.
+> **Synthetic Demonstration & Non-Government Disclaimer:**
+> LandGuard AI is a synthetic demonstration and decision-support system. It is **not** a certified government land registry, nor does it claim official ministry affiliation, legal title certification, or definitive proof of fraud.
 
 ---
 
@@ -31,32 +34,37 @@ Land records and conveyance deeds in Bangladesh frequently encounter disputes st
 
 | Service | Platform | Environment | Live URL |
 | :--- | :--- | :--- | :--- |
-| **Frontend Web App** | Vercel | Production | `https://landguard-ai.vercel.app` (or configured Vercel alias) |
-| **Backend REST API** | Render | Production | `https://landguard-ai-backend.onrender.com` |
-| **API Health Telemetry** | Render | Production | `https://landguard-ai-backend.onrender.com/health` |
-| **Interactive API Docs** | Render | Production | `https://landguard-ai-backend.onrender.com/docs` |
+| **Frontend Web App** | Vercel | Production | [https://land-guard-ai.vercel.app](https://land-guard-ai.vercel.app) |
+| **Backend REST API** | Render | Production | [https://landguard-ai-backend-y2q3.onrender.com](https://landguard-ai-backend-y2q3.onrender.com) |
+| **API Health Telemetry** | Render | Production | [https://landguard-ai-backend-y2q3.onrender.com/health](https://landguard-ai-backend-y2q3.onrender.com/health) |
+| **Interactive API Docs** | Render | Production | [https://landguard-ai-backend-y2q3.onrender.com/docs](https://landguard-ai-backend-y2q3.onrender.com/docs) |
 
 ---
 
-## 3. Key System Features
+## 3. Key Modules & User Journeys
 
-### 3.1 Geospatial Command Center (Reference 3 "God Mode")
-- High-contrast geospatial visual system using the **LandGuard Atlas** palette (`#07141E`, `#102533`, `#20C7D4` in Dark; `#F3F7F8`, `#FFFFFF`, `#087F77` in Light).
-- Interactive Bangladesh administrative framing with cascading selectors for all **8 divisions and 64 districts** with authentic Bengali typography.
-- Tabular KPI rail tracking total parcels (3,000), total conveyances (4,200), multi-deed plots (882), and unreviewed dispute cases (1,188).
-- Forensic scenario distribution visualization across 7 anomaly classifications.
-- Slide-out quick investigation drawer for instant deed triage.
+### 3.1 Greenfield Agricultural Homepage
+- Inspired by Bangladesh land-service portals with warm ivory surfaces, agricultural greenery, and prominent action buttons.
+- 8 responsive service tiles: জমির তথ্য, খতিয়ান/দাগ, লেনদেন যাচাই, ডিজিটাল খসড়া ম্যাপ, RMD অডিট, AI সহকারী, আবেদন অবস্থা, ও সহায়তা কেন্দ্র.
 
-### 3.2 Conceptual 3D Cadastral Parcel Explorer
-- Built with **Three.js** and **React Three Fiber** (`@react-three/fiber@8.17.10` & `three@0.160.0`).
-- Procedural elevated land parcel blocks with heights reflecting transaction volume and risk.
-- Wireframe boundaries, dynamic camera orbit controls, focus feedback, and conflict deed connection arcs.
-- Automatic WebGL error boundary and graceful 2D fallback.
+### 3.2 Cascading Land Search
+- 8 Divisions, 64 Districts, cascading Upazila and Mouza selectors, and Dag/Khatian/Parcel search.
+- Explicit warnings for regions outside the 4 synthetic coverage zones without fabricating fake data.
 
-### 3.3 Full Bilingual Internationalization (EN | বাংলা)
-- Immediate runtime language toggle without full page reload.
-- Typography optimized for Bengali script (`Noto Sans Bengali` & `Hind Siliguri`) with relaxed line heights to eliminate character clipping.
-- Comprehensive localization across all navigation, KPI metrics, filter chips, map controls, and AI audit explanations.
+### 3.3 RMD (Record Mutation Deed) Discrepancy Triangulation
+- Dedicated forensic auditing module correlating:
+  1. **Record of Rights (খতিয়ান)**: Dag no, Khatian no, surveyed acreage, recorded ownership.
+  2. **Registered Deed (দলিল)**: Transaction date, seller/buyer aliases, deed share, registered status.
+  3. **Mutation (নামজারি)**: Case volume, mutation status, and approval alignment.
+- Resolves statuses: `RMD_ALIGNED`, `RMD_CHAIN_DISCREPANCY`, `RMD_MUTATION_MISSING`, `RMD_AREA_OVERCLAIM`.
+
+### 3.4 Digital Khasra Map
+- **Schematic Khasra Mode**: Visual numbered plot diagram with real synthetic record association.
+- **Georeferenced GIS Mode**: Real satellite map overlay with Google Maps / Leaflet integration.
+- Clear disclaimer: *"ধারণামূলক খসড়া মানচিত্র — সরকারি জরিপ নয়"*.
+
+### 3.5 AI Copilot Assistant
+- Context-aware chatbot explaining *"Review Required মানে কী?"*, *"Mutation mismatch কেন?"*, and how to find land records in clear Bengali.
 
 ### 3.4 Forensic AI Assessment Workspace
 - Explainable dual-model audit report:

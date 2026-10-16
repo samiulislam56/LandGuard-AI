@@ -165,5 +165,78 @@
     "pending": "Pending",
     "acres": "acres",
     "na": "Not Available"
+  },
+  "home": {
+    "heroTitle": "Your Land Information, Made Simple",
+    "heroSubtitle": "Search land records, understand potential transaction conflicts, and submit for verification with ease.",
+    "ctaSearch": "Find Land Records",
+    "ctaDemo": "Explore Guest Demo",
+    "guestDemoTitle": "Guest Demo Mode Active",
+    "guestDemoDesc": "You are browsing synthetic cadastral records, plot maps, and screening models without logging in.",
+    "servicesTitle": "Core Services",
+    "servicesSubtitle": "Select a land intelligence service to begin",
+    "tileSearch": "Find Land Records",
+    "tileSearchDesc": "Locate parcels by Division, District, Mouza, and Dag number.",
+    "tileKhatian": "Khatian & Dag Search",
+    "tileKhatianDesc": "Inspect Record of Rights (CS, SA, RS) and recorded ownership.",
+    "tileTransactions": "Transaction Screening",
+    "tileTransactionsDesc": "Verify transfer history and screen for potential double-selling.",
+    "tileKhasra": "Digital Khasra Map",
+    "tileKhasraDesc": "Inspect numbered schematic plot boundaries and cadastral relations.",
+    "tileRMD": "RMD Discrepancy Audit",
+    "tileRMDDesc": "Triangulate consistency across Khatian, Mutation, and Registered Deed.",
+    "tileCopilot": "AI Assistant",
+    "tileCopilotDesc": "Ask land questions in plain language and get step-by-step guidance.",
+    "tileReviews": "Review Queue & Status",
+    "tileReviewsDesc": "Track submitted verification requests and caseworker triage.",
+    "tileReports": "Report Dossier",
+    "tileReportsDesc": "Download official forensic assessment PDF dossiers."
+  },
+  "search": {
+    "title": "Guided Land Search",
+    "subtitle": "Select location and enter Dag or Khatian number to locate synthetic records",
+    "divisionLabel": "Select Division",
+    "districtLabel": "Select District",
+    "upazilaLabel": "Upazila",
+    "mouzaLabel": "Mouza & JL",
+    "identifierLabel": "Dag Number / Khatian Number / Parcel ID",
+    "placeholderIdentifier": "e.g., 102, KH-102, or PARCEL-002911",
+    "submitBtn": "Search",
+    "resetBtn": "Reset",
+    "coverageNotice": "This prototype covers 3,000 synthetic parcels across Dhaka, Chattogram, Rajshahi, and Khulna.",
+    "unsupportedDistrict": "No synthetic records are mapped to the selected district. Please select Dhaka, Chattogram, Rajshahi, or Khulna for demonstration records."
+  },
+  "khasra": {
+    "title": "Digital Khasra Parcel Map",
+    "subtitle": "Numbered plot boundaries and topological relationship visualization",
+    "modeSchematic": "Conceptual Khasra Map",
+    "modeGeo": "Geographic Map",
+    "disclaimer": "Conceptual Khasra Map — Not an official government survey. Provided for synthetic demonstration and decision-support only.",
+    "dagNo": "Dag No",
+    "khatianNo": "Khatian No",
+    "inspectPlot": "Parcel Inspection",
+    "clickPlotHint": "Click on any plot to inspect its registered history and discrepancies."
+  },
+  "rmd": {
+    "title": "RMD (Record-Mutation-Deed) Triangulation Audit",
+    "subtitle": "Cross-verifying Record of Rights (Khatian), Mutation (Namjari), and Registered Deed (Dalil)",
+    "khatianPillar": "1. Record of Rights (Khatian)",
+    "deedPillar": "2. Registered Deed (Sub-Registry)",
+    "mutationPillar": "3. Mutation (Khariz / Namjari)",
+    "aligned": "Consistent & Aligned",
+    "discrepancy": "Discrepancy Detected",
+    "auditAction": "RMD Triangulation Analysis",
+    "recommendationTitle": "Recommendation"
+  },
+  "copilot": {
+    "title": "AI Land Assistant — Copilot",
+    "greeting": "Hello! I am LandGuard AI Assistant. Ask me anything about Khatian, Dag numbers, Mutation, or transaction screening results.",
+    "placeholder": "Type your question (e.g., What does Review Required mean?)...",
+    "disclaimer": "Answers are generated based on synthetic land records and general cadastral guidelines. Not legal advice."
+  },
+  "modes": {
+    "simple": "Simple Mode",
+    "advanced": "Advanced Mode",
+    "badge": "Mode Selector"
   }
 }

@@ -2,19 +2,19 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  LayoutDashboard,
+  Home,
+  Search,
   Compass,
+  Scale,
   Box,
   FileSpreadsheet,
-  Layers,
-  ShieldAlert,
   ClipboardList,
   FileText,
+  HelpCircle,
   Settings,
   ChevronLeft,
   ChevronRight,
-  Shield,
-  Activity,
+  ShieldCheck
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -23,63 +23,53 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const isBn = i18n.language === 'bn';
 
   const navItems = [
-    { label: t('nav.dashboard'), path: '/', icon: LayoutDashboard },
-    { label: t('nav.mapIntelligence'), path: '/#map-view', icon: Compass, isHighlight: true },
-    { label: t('nav.explorer3d'), path: '/explorer-3d', icon: Box, isHighlight: true },
-    { label: t('nav.assessment'), path: '/assess/TX-002911-2', icon: ShieldAlert },
-    { label: t('nav.transactions'), path: '/transactions', icon: FileSpreadsheet },
-    { label: t('nav.parcels'), path: '/parcels/LG-P-002911', icon: Layers },
-    { label: t('nav.reviewCases'), path: '/review-cases', icon: ClipboardList },
-    { label: t('nav.reports'), path: '/reports', icon: FileText },
-    { label: t('nav.settings'), path: '/settings', icon: Settings },
+    { label: isBn ? "হোমপেজ" : "Home", path: '/', icon: Home },
+    { label: isBn ? "জমি খুঁজুন" : "Land Search", path: '/search', icon: Search, isHighlight: true },
+    { label: isBn ? "খসড়া ম্যাপ" : "Khasra Map", path: '/khasra-map', icon: Compass, isHighlight: true },
+    { label: isBn ? "RMD অডিট" : "RMD Audit", path: '/rmd', icon: Scale, isHighlight: true },
+    { label: isBn ? "৩ডি এক্সপ্লোরার" : "3D Explorer", path: '/explorer-3d', icon: Box },
+    { label: isBn ? "লেনদেন তালিকা" : "Transactions", path: '/transactions', icon: FileSpreadsheet },
+    { label: isBn ? "রিভিউ ওয়ার্কস্পেস" : "Review Queue", path: '/reviews', icon: ClipboardList },
+    { label: isBn ? "প্রতিবেদন কেন্দ্র" : "Reports", path: '/reports', icon: FileText },
+    { label: isBn ? "সহায়তা ও পরিভাষা" : "Help & Glossary", path: '/help', icon: HelpCircle },
+    { label: isBn ? "সেটিংস" : "Settings", path: '/settings', icon: Settings },
   ];
 
   return (
     <aside
-      className={`hidden md:flex flex-col border-r border-atlas-border bg-[#07141E] text-slate-100 transition-all duration-300 z-20 shrink-0 select-none ${
-        isCollapsed ? 'w-16' : 'w-64'
+      className={`hidden md:flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-all duration-300 z-20 shrink-0 select-none shadow-sm ${
+        isCollapsed ? 'w-16' : 'w-60'
       }`}
       aria-label="Main Navigation"
     >
-      {/* Brand Header */}
-      <div className="h-16 flex items-center justify-between px-3.5 border-b border-atlas-border bg-[#102533]">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-700 text-white flex items-center justify-center shrink-0 shadow-lg shadow-cyan-500/20 border border-cyan-400/40 font-mono font-bold text-xs tracking-wider">
-            LG
-          </div>
-          {!isCollapsed && (
-            <div className="flex flex-col overflow-hidden">
-              <span className="font-extrabold text-sm tracking-tight text-white flex items-center gap-1.5">
-                {t('app.name')}
-                <span className="w-1.5 h-1.5 rounded-full bg-atlas-cyan animate-pulse" />
-              </span>
-              <span className="text-[10px] uppercase font-mono tracking-wider text-atlas-cyan/90">
-                {t('app.subtitle')}
-              </span>
-            </div>
-          )}
-        </div>
-
+      {/* Sidebar Header / Toggle */}
+      <div className="h-16 flex items-center justify-between px-3.5 border-b border-slate-100 dark:border-slate-800">
+        {!isCollapsed && (
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
+            {isBn ? "সেবা ও নেভিগেশন" : "Navigation"}
+          </span>
+        )}
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
-          title={isCollapsed ? t('nav.expand') : t('nav.collapse')}
-          aria-label={isCollapsed ? t('nav.expand') : t('nav.collapse')}
+          className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ml-auto"
+          title={isCollapsed ? "প্রসারিত করুন" : "সংকুচিত করুন"}
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
-            <ChevronRight className="w-4 h-4" aria-hidden="true" />
+            <ChevronRight className="w-4 h-4" />
           ) : (
-            <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+            <ChevronLeft className="w-4 h-4" />
           )}
         </button>
       </div>
 
       {/* Nav List */}
-      <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
+      <nav className="flex-1 py-3 px-2 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -88,21 +78,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
               to={item.path}
               title={isCollapsed ? item.label : undefined}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold tracking-wide transition-all ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${
                   isActive
-                    ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/10 text-atlas-cyan border border-atlas-cyan/40 shadow-sm font-bold'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-emerald-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 } ${isCollapsed ? 'justify-center px-0' : ''}`
               }
             >
               <div
-                className={`p-1.5 rounded-lg transition-colors ${
+                className={`p-1 rounded-lg transition-colors ${
                   item.isHighlight
-                    ? 'bg-atlas-cyan/20 text-atlas-cyan'
-                    : 'text-slate-400 group-hover:text-white'
+                    ? 'text-emerald-700 dark:text-emerald-400'
+                    : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
-                <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <Icon className="w-4 h-4" />
               </div>
               {!isCollapsed && <span className="truncate">{item.label}</span>}
             </NavLink>
@@ -110,31 +100,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse 
         })}
       </nav>
 
-      {/* Footer Info / Auditor Profile Card */}
-      <div className="p-3 border-t border-atlas-border bg-[#102533]">
-        {!isCollapsed ? (
-          <div className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-900/60 border border-atlas-cyan/20">
-            <div className="w-8 h-8 rounded-lg bg-teal-950 border border-teal-500/40 flex items-center justify-center shrink-0">
-              <Shield className="w-4 h-4 text-atlas-cyan" />
-            </div>
-            <div className="flex flex-col min-w-0 flex-1">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white truncate">{t('app.auditorConsole')}</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              </div>
-              <span className="text-[10px] font-mono text-atlas-cyan truncate flex items-center gap-1">
-                <Activity className="w-2.5 h-2.5" /> {t('app.fastapiLive')}
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div className="flex justify-center" title={t('app.auditorConsole')}>
-            <div className="w-8 h-8 rounded-lg bg-teal-950 border border-teal-500/40 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-atlas-cyan" />
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Guest Mode Footer */}
+      {!isCollapsed && (
+        <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 m-2 rounded-xl text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{isBn ? "উন্মুক্ত সিন্থেটিক মডেল" : "Synthetic Prototype"}</span>
+        </div>
+      )}
     </aside>
   );
 };
