@@ -33,6 +33,7 @@ import { CadastralMap } from '../components/gis/CadastralMap';
 import { Cadastral3DExplorer } from '../components/gis/Cadastral3DExplorer';
 import { AssetNetworkGraph } from '../components/gis/AssetNetworkGraph';
 import { SAMPLE_CADASTRAL_PLOTS } from '../lib/geo';
+import { AnimatedCadastralMotif } from '../components/ui/AnimatedCadastralMotif';
 import {
   BANGLADESH_DIVISIONS_LIST,
   BANGLADESH_DISTRICTS,
@@ -198,6 +199,63 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-4 pb-8 select-none">
+      {/* =========================================================================
+          SECTION 0: LIVING LAND DASHBOARD BANNER — CONTINUOUS BOTANICAL MOTION & CADASTRAL ANIMATION
+          ========================================================================= */}
+      <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-emerald-800/30 bg-[#062B22] p-5 sm:p-7">
+        {/* Continuous Animated Land Photography Background Layer */}
+        <div
+          className="absolute inset-0 bg-cover bg-center motion-safe:animate-[slow-drift_25s_ease-in-out_infinite_alternate] opacity-40 pointer-events-none"
+          style={{
+            backgroundImage: "url('/assets/images/hero-bg.jpg')",
+            willChange: 'transform'
+          }}
+        />
+
+        {/* Ambient Dark Forest Vignette */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#062B22]/95 via-[#062B22]/85 to-[#062B22]/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#062B22] via-transparent to-black/30 pointer-events-none" />
+
+        {/* Continuous Animated Cadastral Boundary Lines Layer */}
+        <div className="absolute right-0 bottom-0 top-0 w-full md:w-2/3 pointer-events-none opacity-60">
+          <AnimatedCadastralMotif className="w-full h-full object-cover" />
+        </div>
+
+        {/* Banner Content */}
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1.5 max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/80 border border-emerald-500/40 text-[#C4E8A5] text-xs font-semibold backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>Living Land • জীবন্ত ভূমির চলমান অ্যানিমেশন</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              {isBn ? "স্মার্ট ক্যাডাস্ট্রাল ড্যাশবোর্ড ও স্ক্রিনিং কমান্ড সেন্টার" : "Smart Cadastral Dashboard & Screening Command Center"}
+            </h1>
+            <p className="text-xs sm:text-sm text-emerald-100/80 leading-relaxed font-normal">
+              {isBn 
+                ? "বাংলাদেশের ৬৪টি জেলার ক্যাডাস্ট্রাল পার্সেল, লাইভ জিআইএস খসড়া ম্যাপ ও সিন্থেটিক দ্বৈত-বিক্রয় ঝুঁকি স্ক্রিনিং ইন্টেলিজেন্স।" 
+                : "Real-time GIS cadastral boundary inspection, synthetic transaction verification, and dual-sale risk screening."}
+            </p>
+          </div>
+
+          {/* Quick Metrics Badges & Shortcuts */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="px-3 py-1.5 rounded-2xl bg-black/50 backdrop-blur-md border border-emerald-500/30 text-center min-w-[80px]">
+              <span className="block text-[9px] uppercase font-mono text-emerald-400 font-bold">{isBn ? "মোট পার্সেল" : "PARCELS"}</span>
+              <span className="font-mono text-sm sm:text-base font-extrabold text-white">{summary?.parcels || 3000}</span>
+            </div>
+            <div className="px-3 py-1.5 rounded-2xl bg-black/50 backdrop-blur-md border border-emerald-500/30 text-center min-w-[80px]">
+              <span className="block text-[9px] uppercase font-mono text-emerald-400 font-bold">{isBn ? "স্ক্রিন্ড লেনদেন" : "TX COUNT"}</span>
+              <span className="font-mono text-sm sm:text-base font-extrabold text-white">{summary?.transactions || 3851}</span>
+            </div>
+            <div className="px-3 py-1.5 rounded-2xl bg-black/50 backdrop-blur-md border border-rose-500/40 text-center min-w-[80px]">
+              <span className="block text-[9px] uppercase font-mono text-rose-400 font-bold">{isBn ? "ঝুঁকি কেস" : "FLAGGED"}</span>
+              <span className="font-mono text-sm sm:text-base font-extrabold text-rose-300">{summary?.review_cases || 1188}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* =========================================================================
           SECTION 1: GEOSPATIAL FILTERS & SEARCH STRIP (Directly matching Reference 3)
           ========================================================================= */}

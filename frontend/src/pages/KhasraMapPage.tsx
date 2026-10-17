@@ -8,7 +8,10 @@ import {
   AlertTriangle, 
   Info,
   Scale,
-  Box
+  Box,
+  Search,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -38,6 +41,13 @@ const SCHEMATIC_PLOTS: KhasraPlot[] = [
   { dag_no: "108", khatian_no: "KH-108", parcel_id: "LG-P-002917", area_acres: 0.70, status: "clean", owner: "PERSON-0182", polygon: "M 490 160 L 610 180 L 600 310 L 480 295 Z", center: [545, 236] }
 ];
 
+// Cadastral Survey Boundary Corner Stones ("সীমানা পিলার / বেড়ের কোণা")
+const SURVEY_CORNER_STONES: [number, number][] = [
+  [40, 40], [180, 30], [340, 45], [480, 35], [620, 50],
+  [50, 160], [190, 150], [350, 170], [490, 160], [610, 180],
+  [40, 280], [180, 290], [340, 300], [480, 295], [600, 310]
+];
+
 export const KhasraMapPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const isBn = i18n.language === 'bn';
@@ -45,6 +55,7 @@ export const KhasraMapPage: React.FC = () => {
   const initialParcel = searchParams.get('parcel');
 
   const [activeMode, setActiveMode] = useState<'schematic' | 'geo'>('schematic');
+  const [searchDagQuery, setSearchDagQuery] = useState<string>('');
   const [selectedDag, setSelectedDag] = useState<string>(() => {
     if (initialParcel) {
       const match = SCHEMATIC_PLOTS.find(p => p.parcel_id === initialParcel);
@@ -55,12 +66,18 @@ export const KhasraMapPage: React.FC = () => {
 
   const selectedPlot = SCHEMATIC_PLOTS.find(p => p.dag_no === selectedDag) || SCHEMATIC_PLOTS[1];
 
+  const filteredPlots = SCHEMATIC_PLOTS.filter(p => 
+    !searchDagQuery.trim() || 
+    p.dag_no.includes(searchDagQuery.trim()) ||
+    p.parcel_id.toLowerCase().includes(searchDagQuery.trim().toLowerCase())
+  );
+
   const getStatusColor = (status: string): { fill: string; stroke: string; badge: BadgeVariant; label: string } => {
     switch (status) {
       case 'conflict': return { fill: 'rgba(239, 68, 68, 0.25)', stroke: '#DC2626', badge: 'danger', label: isBn ? 'দ্বন্দ্বমূলক বিক্রয়' : 'Conflict' };
       case 'mismatch': return { fill: 'rgba(245, 158, 11, 0.25)', stroke: '#D97706', badge: 'warning', label: isBn ? 'নামজারি অমিল' : 'Mismatch' };
       case 'review': return { fill: 'rgba(59, 130, 246, 0.25)', stroke: '#2563EB', badge: 'default', label: isBn ? 'পর্যালোচনা' : 'Review' };
-      default: return { fill: 'rgba(16, 185, 129, 0.25)', stroke: '#059669', badge: 'success', label: isBn ? 'স্বাভাবিক' : 'Clean' };
+      default: return { fill: 'rgba(16, 185, 129, 0.25)', stroke: '#047857', badge: 'success', label: isBn ? 'স্বাভাবিক' : 'Clean' };
     }
   };
 
@@ -121,6 +138,48 @@ export const KhasraMapPage: React.FC = () => {
         </p>
       </div>
 
+      {/* Interactive Dag Quick Switcher & Search Bar */}
+      <div className="p-3 bg-white dark:bg-slate-850 rounded-2xl border border-emerald-800/20 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-3">
+        {/* Left: Quick search input */}
+        <div className="relative min-w-[220px]">
+          <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
+          <input
+            type="text"
+            value={searchDagQuery}
+            onChange={(e) => setSearchDagQuery(e.target.value)}
+            placeholder={isBn ? "দাগ নম্বর খুঁজুন (যেমন: ১০২)..." : "Search Dag (e.g. 102)..."}
+            className="w-full text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-inner"
+          />
+        </div>
+
+        {/* Right: Horizontal scrollable Dag selector pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-thin">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap mr-1 flex items-center gap-1">
+            <Layers className="w-3.5 h-3.5 text-emerald-600" />
+            {isBn ? "দাগের তালিকা:" : "Dag List:"}
+          </span>
+          {filteredPlots.map((plot) => {
+            const isSelected = selectedDag === plot.dag_no;
+            const statusStyle = getStatusColor(plot.status);
+            return (
+              <button
+                key={plot.dag_no}
+                type="button"
+                onClick={() => setSelectedDag(plot.dag_no)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 shadow-sm ${
+                  isSelected
+                    ? 'bg-amber-400 dark:bg-amber-500 text-slate-950 ring-2 ring-amber-500 scale-105'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: statusStyle.stroke }} />
+                <span>দাগ {plot.dag_no}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Main Map Container */}
       {activeMode === 'schematic' ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -130,7 +189,7 @@ export const KhasraMapPage: React.FC = () => {
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3 px-2">
               <div>
                 <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider block">
-                  মৌজা মানচিত্র স্কেচ
+                  মৌজা মানচিত্র স্কেচ • সীমানা বেড় ও পিলার
                 </span>
                 <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
                   আমিনবাজার (JL 45), সাভার
@@ -139,22 +198,26 @@ export const KhasraMapPage: React.FC = () => {
 
               <div className="flex items-center gap-3 text-xs">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded bg-emerald-500" />
+                  <span className="w-3 h-3 rounded bg-emerald-600" />
                   {isBn ? "স্বাভাবিক" : "Clean"}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded bg-rose-500" />
+                  <span className="w-3 h-3 rounded bg-rose-600" />
                   {isBn ? "দ্বন্দ্বমূলক" : "Conflict"}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded bg-amber-500" />
                   {isBn ? "নামজারি অমিল" : "Mismatch"}
                 </span>
+                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-800 dark:text-emerald-300 font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/80">
+                  <Sparkles className="w-3 h-3 text-amber-500" />
+                  উজ্জ্বল সীমানা বেড়
+                </span>
               </div>
             </div>
 
             {/* Interactive SVG Cadastral Grid */}
-            <div className="w-full bg-white dark:bg-slate-800/80 rounded-xl p-3 border border-slate-200 dark:border-slate-700 shadow-inner flex items-center justify-center">
+            <div className="w-full bg-white dark:bg-slate-800/90 rounded-xl p-3 border-2 border-emerald-800/20 shadow-inner flex items-center justify-center">
               <svg
                 viewBox="0 0 660 360"
                 className="w-full h-auto max-h-[460px] select-none"
@@ -177,26 +240,58 @@ export const KhasraMapPage: React.FC = () => {
                   {isBn ? "মৌজা সংযোগ রাস্তা" : "Connecting Village Road"}
                 </text>
 
-                {/* Parcel Polygons */}
+                {/* Outer Mouza Boundary Perimeter (মৌজার বহিঃসীমানা বেড়) */}
+                <rect
+                  x="22"
+                  y="15"
+                  width="616"
+                  height="315"
+                  rx="12"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="2.5"
+                  strokeDasharray="8 6"
+                  opacity="0.8"
+                />
+                <text x="330" y="324" fill="#047857" fontSize="10" fontWeight="bold" textAnchor="middle">
+                  {isBn ? "আমিনবাজার মৌজা বহিঃসীমানা বেড় (Mouza Boundary Ridge)" : "Mouza Boundary Ridge"}
+                </text>
+
+                {/* Parcel Polygons with High-Contrast Boundary Borders ("জমির বেড়") */}
                 {SCHEMATIC_PLOTS.map((plot) => {
                   const style = getStatusColor(plot.status);
                   const isSelected = selectedDag === plot.dag_no;
 
                   return (
                     <g key={plot.dag_no} onClick={() => setSelectedDag(plot.dag_no)} className="cursor-pointer group">
+                      {/* Outer Glowing Border Aura for Selected Plot */}
+                      {isSelected && (
+                        <path
+                          d={plot.polygon}
+                          fill="none"
+                          stroke="#F59E0B"
+                          strokeWidth="8"
+                          strokeLinejoin="round"
+                          opacity="0.7"
+                        />
+                      )}
+
+                      {/* Main Plot Cadastral Boundary ("জমির মূল বেড়") */}
                       <path
                         d={plot.polygon}
                         fill={isSelected ? '#FEF08A' : style.fill}
-                        stroke={isSelected ? '#B45309' : style.stroke}
-                        strokeWidth={isSelected ? '3.5' : '2'}
+                        stroke={isSelected ? '#78350F' : style.stroke}
+                        strokeWidth={isSelected ? '4.5' : '3.5'}
+                        strokeLinejoin="round"
                         className="transition-all duration-200 hover:brightness-105"
                       />
+
                       {/* Dag Number Badge */}
                       <circle
                         cx={plot.center[0]}
                         cy={plot.center[1] - 8}
-                        r="14"
-                        fill={isSelected ? '#B45309' : style.stroke}
+                        r="15"
+                        fill={isSelected ? '#78350F' : style.stroke}
                         className="transition-transform group-hover:scale-110"
                       />
                       <text
@@ -214,9 +309,9 @@ export const KhasraMapPage: React.FC = () => {
                       <text
                         x={plot.center[0]}
                         y={plot.center[1] + 16}
-                        fill={isSelected ? '#78350F' : '#334155'}
+                        fill={isSelected ? '#78350F' : '#0F172A'}
                         fontSize="10"
-                        fontWeight="600"
+                        fontWeight="bold"
                         textAnchor="middle"
                       >
                         {plot.area_acres} {isBn ? "একর" : "ac"}
@@ -224,6 +319,14 @@ export const KhasraMapPage: React.FC = () => {
                     </g>
                   );
                 })}
+
+                {/* Cadastral Survey Boundary Corner Stone Markers ("সীমানা পিলার") */}
+                {SURVEY_CORNER_STONES.map(([cx, cy], i) => (
+                  <g key={`corner-${i}`}>
+                    <circle cx={cx} cy={cy} r="4.5" fill="#D97706" stroke="#FFFFFF" strokeWidth="1.5" />
+                    <circle cx={cx} cy={cy} r="2" fill="#78350F" />
+                  </g>
+                ))}
               </svg>
             </div>
 

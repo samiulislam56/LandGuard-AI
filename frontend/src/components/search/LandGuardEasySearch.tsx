@@ -8,10 +8,6 @@ import {
   ChevronRight, 
   ChevronLeft, 
   RotateCcw, 
-  Mic, 
-  MicOff, 
-  Volume2, 
-  VolumeX, 
   Compass, 
   Sparkles, 
   Search,
@@ -20,7 +16,6 @@ import {
 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { useVoiceAssistant } from '../../hooks/useVoiceAssistant';
 
 interface SampleParcel {
   parcel_id: string;
@@ -94,32 +89,7 @@ export const LandGuardEasySearch: React.FC<{ onSwitchToAdvanced?: () => void }> 
   const [identifier, setIdentifier] = useState<string>('102');
   const [selectedResult, setSelectedResult] = useState<SampleParcel | null>(null);
 
-  // Voice Assistant Hook
-  const voice = useVoiceAssistant(isBn ? 'bn' : 'en');
-
-  // Handle Voice Action
-  const handleVoiceConfirm = () => {
-    voice.confirmAndProcess();
-    if (voice.transcript) {
-      if (voice.transcript.includes('২৯১১') || voice.transcript.includes('2911')) {
-        setDivision('dhaka');
-        setDistrict('Dhaka');
-        setIdentifier('LG-P-002911');
-        setStep(3);
-        setSelectedResult(EASY_SAMPLES[0]);
-      } else if (voice.transcript.includes('১০২') || voice.transcript.includes('102')) {
-        setIdentifier('102');
-      }
-    }
-  };
-
   const handleStep1Next = () => {
-    voice.speakText(
-      isBn 
-        ? `${district} জেলা নির্বাচিত হয়েছে। এবার আপনার জমির দাগ নম্বর বা খতিয়ান নম্বর লিখুন।` 
-        : `District ${district} selected. Now enter your Dag or Khatian number.`,
-      isBn ? 'bn' : 'en'
-    );
     setStep(2);
   };
 
@@ -133,13 +103,6 @@ export const LandGuardEasySearch: React.FC<{ onSwitchToAdvanced?: () => void }> 
 
     setSelectedResult(found);
     setStep(3);
-
-    voice.speakText(
-      isBn 
-        ? `জমির রেকর্ড পাওয়া গেছে। পার্সেল আইডি ${found.parcel_id}, দাগ ${found.dag_no}। ফলাফল: ${found.status_bn}।` 
-        : `Land record found. Parcel ${found.parcel_id}, Dag ${found.dag_no}. Status: ${found.status_en}.`,
-      isBn ? 'bn' : 'en'
-    );
   };
 
   const handleReset = () => {
@@ -148,7 +111,6 @@ export const LandGuardEasySearch: React.FC<{ onSwitchToAdvanced?: () => void }> 
     setDistrict('Dhaka');
     setIdentifier('102');
     setSelectedResult(null);
-    voice.stopSpeaking();
   };
 
   return (
@@ -183,32 +145,15 @@ export const LandGuardEasySearch: React.FC<{ onSwitchToAdvanced?: () => void }> 
           </div>
         </div>
 
-        {/* Read aloud & Reset controls */}
+        {/* Reset control */}
         <div className="flex items-center gap-2 ml-4">
-          <button
-            onClick={() => {
-              if (voice.isSpeaking) {
-                voice.stopSpeaking();
-              } else {
-                const text = step === 1 
-                  ? 'ধাপ ১: আপনার বিভাগ ও জেলা নির্বাচন করুন।' 
-                  : step === 2 
-                  ? 'ধাপ ২: আপনার জমির দাগ নম্বর বা খতিয়ান নম্বর লিখুন অথবা নিচের নমুনা বোতামে চাপুন।' 
-                  : 'ধাপ ৩: আপনার জমির তথ্য নিচে প্রদর্শিত হচ্ছে।';
-                voice.speakText(text, isBn ? 'bn' : 'en');
-              }
-            }}
-            title={isBn ? "পড়ে শোনান" : "Read aloud"}
-            className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-800/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 transition-colors"
-          >
-            {voice.isSpeaking ? <VolumeX className="w-5 h-5 text-rose-500 animate-pulse" /> : <Volume2 className="w-5 h-5" />}
-          </button>
           <button
             onClick={handleReset}
             title={isBn ? "পুনরায় শুরু করুন" : "Reset"}
-            className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-xs font-semibold"
           >
-            <RotateCcw className="w-5 h-5" />
+            <RotateCcw className="w-4 h-4 text-emerald-600" />
+            <span className="hidden sm:inline">{isBn ? "পুনরায় শুরু" : "Reset"}</span>
           </button>
         </div>
       </div>
@@ -356,12 +301,12 @@ export const LandGuardEasySearch: React.FC<{ onSwitchToAdvanced?: () => void }> 
                 ধাপ ২: জমির দাগ, খতিয়ান বা পার্সেল নম্বর
               </h2>
               <p className="text-sm text-slate-600 dark:text-slate-300">
-                আপনার দলিলের দাগ নম্বর লিখুন অথবা মুখে বলুন।
+                আপনার দলিলের দাগ নম্বর, খতিয়ান বা পার্সেল নম্বর লিখুন।
               </p>
             </div>
           </div>
 
-          {/* Input field with voice button */}
+          {/* Clean Input field without voice */}
           <div className="space-y-3">
             <div className="relative">
               <input
@@ -369,47 +314,12 @@ export const LandGuardEasySearch: React.FC<{ onSwitchToAdvanced?: () => void }> 
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="যেমন: ১০২ অথবা LG-P-002911"
-                className="w-full pl-5 pr-28 py-4 rounded-2xl border-2 border-emerald-600/40 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono text-lg focus:outline-none focus:border-emerald-600 shadow-inner"
+                className="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-emerald-600/40 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono text-lg focus:outline-none focus:border-emerald-600 shadow-inner"
               />
-              <div className="absolute right-2.5 top-2.5 flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (voice.status === 'listening') {
-                      voice.stopListening();
-                    } else {
-                      voice.startListening();
-                    }
-                  }}
-                  className={`p-2.5 rounded-xl transition-all flex items-center gap-1.5 text-xs font-bold ${
-                    voice.status === 'listening'
-                      ? 'bg-rose-600 text-white animate-pulse'
-                      : 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200'
-                  }`}
-                  title="ভয়েসে বলুন"
-                >
-                  {voice.status === 'listening' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                  <span className="hidden sm:inline">
-                    {voice.status === 'listening' ? 'শুনছি...' : 'ভয়েস'}
-                  </span>
-                </button>
+              <div className="absolute right-3 top-3.5 flex items-center text-emerald-600 pointer-events-none">
+                <Search className="w-6 h-6 opacity-60" />
               </div>
             </div>
-
-            {/* Voice Transcription Feedback */}
-            {voice.transcript && (
-              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 flex items-center justify-between">
-                <div className="text-xs text-slate-800 dark:text-slate-200">
-                  <span className="font-semibold text-emerald-700">আপনি বলেছেন:</span> "{voice.transcript}"
-                </div>
-                <button
-                  onClick={handleVoiceConfirm}
-                  className="px-3 py-1 bg-emerald-700 text-white rounded-lg text-xs font-semibold hover:bg-emerald-800"
-                >
-                  নিশ্চিত করুন
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Quick Clickable Sample Cards */}

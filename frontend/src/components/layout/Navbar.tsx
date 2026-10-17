@@ -8,7 +8,9 @@ import {
   Menu,
   Languages,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  Compass,
+  LayoutDashboard
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../context/ThemeContext';
@@ -101,6 +103,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
           </button>
         </div>
       </form>
+
+      {/* Center-Right: Prominent Top Navigation Links (Desktop) */}
+      <div className="hidden xl:flex items-center gap-2">
+        <Link
+          to="/khasra-map"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-750 transition-all shadow-sm"
+          title={currentLang === 'bn' ? "ডিজিটাল খসড়া ম্যাপ" : "Digital Khasra Map"}
+        >
+          <Compass className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>{currentLang === 'bn' ? "খসড়া ম্যাপ" : "Khasra Map"}</span>
+        </Link>
+        <Link
+          to="/dashboard"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-750 transition-all shadow-sm"
+          title={currentLang === 'bn' ? "ক্যাডাস্ট্রাল ড্যাশবোর্ড" : "Cadastral Dashboard"}
+        >
+          <LayoutDashboard className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+          <span>{currentLang === 'bn' ? "ড্যাশবোর্ড" : "Dashboard"}</span>
+        </Link>
+      </div>
 
       {/* Right: Demo Mode Indicator, Guest Demo / Login Link, Language, Theme, Quick Shortcuts */}
       <div className="flex items-center gap-2">
