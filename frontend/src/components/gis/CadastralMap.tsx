@@ -15,6 +15,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import {
   CadastralPlotGeo,
@@ -66,6 +67,7 @@ export const CadastralMap: React.FC<CadastralMapProps> = ({
   height = '560px',
   showControls = true,
 }) => {
+  const { t } = useTranslation();
   const effectiveDistrictId = (selectedDistrictId || initialDistrict || 'dhaka').toLowerCase();
   const navigate = useNavigate();
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -95,12 +97,13 @@ export const CadastralMap: React.FC<CadastralMapProps> = ({
       map.removeLayer(tileLayerRef.current);
     }
 
-    let url = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-    let attribution = '&copy; OpenStreetMap &copy; CARTO';
+    // High-reliability keyless GIS tile endpoints (No watermark, No API key required)
+    let url = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+    let attribution = '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ';
     let maxZoom = 18;
 
     if (layer === 'satellite') {
-      // Safe Esri World Imagery (clamped to maxNativeZoom 18 to avoid 404s)
+      // Safe Esri World Imagery
       url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
       attribution = '&copy; Esri &mdash; High-Resolution Satellite';
       maxZoom = 18;
@@ -114,7 +117,6 @@ export const CadastralMap: React.FC<CadastralMapProps> = ({
       attribution,
       maxZoom,
       maxNativeZoom: 18,
-      subdomains: 'abcd',
       crossOrigin: true,
     });
 
@@ -420,7 +422,7 @@ export const CadastralMap: React.FC<CadastralMapProps> = ({
           {/* Right Toolbar Controls */}
           <div className="flex items-center gap-2 pointer-events-auto">
             {/* Layer Switcher */}
-            <div className="flex items-center p-1 rounded-xl bg-slate-950/90 backdrop-blur-md border border-cadastral-teal/30 shadow-xl">
+            <div className="flex items-center p-1 rounded-2xl bg-[#062B22]/90 backdrop-blur-md border border-emerald-500/30 shadow-xl">
               <button
                 type="button"
                 title="Midnight Cadastral (Deep Navy GIS)"
@@ -428,13 +430,13 @@ export const CadastralMap: React.FC<CadastralMapProps> = ({
                   setActiveLayer('midnight');
                   if (mapInstanceRef.current) updateTileLayer('midnight', mapInstanceRef.current);
                 }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition-colors ${
+                className={`px-3 py-1 rounded-xl text-xs font-mono font-semibold transition-colors ${
                   activeLayer === 'midnight'
-                    ? 'bg-cadastral-teal text-slate-950 font-bold shadow'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-emerald-600 text-white font-bold shadow'
+                    : 'text-emerald-100 hover:text-white'
                 }`}
               >
-                Midnight
+                {t('map.midnight', 'মিডনাইট')}
               </button>
               <button
                 type="button"
@@ -443,13 +445,13 @@ export const CadastralMap: React.FC<CadastralMapProps> = ({
                   setActiveLayer('satellite');
                   if (mapInstanceRef.current) updateTileLayer('satellite', mapInstanceRef.current);
                 }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition-colors ${
+                className={`px-3 py-1 rounded-xl text-xs font-mono font-semibold transition-colors ${
                   activeLayer === 'satellite'
-                    ? 'bg-cadastral-teal text-slate-950 font-bold shadow'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-emerald-600 text-white font-bold shadow'
+                    : 'text-emerald-100 hover:text-white'
                 }`}
               >
-                Satellite
+                {t('map.satellite', 'স্যাটেলাইট')}
               </button>
               <button
                 type="button"
@@ -458,13 +460,13 @@ export const CadastralMap: React.FC<CadastralMapProps> = ({
                   setActiveLayer('survey');
                   if (mapInstanceRef.current) updateTileLayer('survey', mapInstanceRef.current);
                 }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition-colors ${
+                className={`px-3 py-1 rounded-xl text-xs font-mono font-semibold transition-colors ${
                   activeLayer === 'survey'
-                    ? 'bg-cadastral-teal text-slate-950 font-bold shadow'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-emerald-600 text-white font-bold shadow'
+                    : 'text-emerald-100 hover:text-white'
                 }`}
               >
-                Survey
+                {t('map.survey', 'সার্ভে')}
               </button>
             </div>
 

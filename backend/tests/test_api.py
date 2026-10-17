@@ -83,6 +83,22 @@ def test_parcel_history():
     assert dates == sorted(dates)
 
 
+def test_parcel_history_legacy_alias():
+    # Alias PARCEL-002911 should cleanly resolve to canonical LG-P-002911
+    response = client.get("/parcels/PARCEL-002911/history")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["parcel"]["parcel_id"] == "LG-P-002911"
+    assert data["total_transactions"] == 3
+
+
+def test_parcel_history_not_found():
+    response = client.get("/parcels/NONEXISTENT-PARCEL-9999/history")
+    assert response.status_code == 404
+    data = response.json()
+    assert "Record not found" in data["detail"]
+
+
 def test_assess_tx_002911_1():
     response = client.get("/assess/TX-002911-1?as_of_date=2026-10-15")
     assert response.status_code == 200

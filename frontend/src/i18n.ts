@@ -18,6 +18,15 @@ i18n
     interpolation: {
       escapeValue: false, // React already escapes values
     },
+    parseMissingKeyHandler: (key: string, defaultValue?: string) => {
+      if (defaultValue) return defaultValue;
+      const lastPart = key.split('.').pop() || key;
+      // Convert camelCase or dot notations to readable title
+      return lastPart
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, (str) => str.toUpperCase())
+        .trim();
+    },
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],

@@ -508,12 +508,20 @@ def transaction_detail(transaction_id: str):
 @app.get("/parcels/{parcel_id}/history")
 def parcel_history(parcel_id: str):
     tables, _, _ = resources()
+
+    # Support legacy explicit alias mapping (e.g. PARCEL-002911 -> LG-P-002911)
+    canonical_id = parcel_id
+    if parcel_id.startswith("PARCEL-"):
+        candidate = parcel_id.replace("PARCEL-", "LG-P-")
+        if not tables["parcels"][tables["parcels"]["parcel_id"] == candidate].empty:
+            canonical_id = candidate
+
     parcel = get_record(
-        tables["parcels"], "parcel_id", parcel_id
+        tables["parcels"], "parcel_id", canonical_id
     )
 
     history = tables["transactions"][
-        tables["transactions"]["parcel_id"] == parcel_id
+        tables["transactions"]["parcel_id"] == canonical_id
     ].sort_values("transaction_date")
 
     return clean({

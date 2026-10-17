@@ -139,10 +139,10 @@ const GEO_HIERARCHY: Record<string, DivisionData> = {
 
 // Demo quick search examples
 const DEMO_PARCEL_SAMPLES = [
-  { parcel_id: "PARCEL-002911", district: "Dhaka", upazila: "Savar", mouza: "Aminbazar", dag_no: "102", khatian_no: "KH-102", total_area_acres: 0.55, scenario: "conflicting_sale" },
-  { parcel_id: "PARCEL-000104", district: "Chattogram", upazila: "Pahartali", mouza: "North Kattali", dag_no: "205", khatian_no: "KH-205", total_area_acres: 0.82, scenario: "clean" },
-  { parcel_id: "PARCEL-001420", district: "Rajshahi", upazila: "Paba", mouza: "Nowhata", dag_no: "310", khatian_no: "KH-310", total_area_acres: 1.15, scenario: "mutation_mismatch" },
-  { parcel_id: "PARCEL-000850", district: "Khulna", upazila: "Rupsha", mouza: "Naihati", dag_no: "418", khatian_no: "KH-418", total_area_acres: 0.40, scenario: "area_mismatch" }
+  { parcel_id: "LG-P-002911", district: "Dhaka", upazila: "Savar", mouza: "Aminbazar", dag_no: "102", khatian_no: "KH-102", total_area_acres: 0.55, scenario: "conflicting_sale" },
+  { parcel_id: "LG-P-000104", district: "Chattogram", upazila: "Pahartali", mouza: "North Kattali", dag_no: "205", khatian_no: "KH-205", total_area_acres: 0.82, scenario: "clean" },
+  { parcel_id: "LG-P-001420", district: "Rajshahi", upazila: "Paba", mouza: "Nowhata", dag_no: "310", khatian_no: "KH-310", total_area_acres: 1.15, scenario: "mutation_mismatch" },
+  { parcel_id: "LG-P-000850", district: "Khulna", upazila: "Rupsha", mouza: "Naihati", dag_no: "418", khatian_no: "KH-418", total_area_acres: 0.40, scenario: "area_mismatch" }
 ];
 
 export const SearchPage: React.FC = () => {
@@ -299,7 +299,7 @@ export const SearchPage: React.FC = () => {
                 type="text"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder={t('search.placeholderIdentifier', 'যেমন: 102, KH-102, বা PARCEL-002911')}
+                placeholder={t('search.placeholderIdentifier', 'যেমন: 102, KH-102, বা LG-P-002911')}
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-emerald-600 focus:bg-white"
               />
             </div>

@@ -8,6 +8,7 @@
     "offline": "Offline",
     "connecting": "Connecting...",
     "disclaimer": "SYNTHETIC DEMONSTRATION DATA ONLY: LandGuard AI evaluates synthetic deed sequences to screen double-selling risk and record anomalies. It does NOT declare legal title or official land ownership.",
+    "syntheticDisclaimer": "SYNTHETIC DEMONSTRATION DATA ONLY: LandGuard AI evaluates synthetic deed sequences to screen double-selling risk and record anomalies. It does NOT declare legal title or official land ownership.",
     "benchmarkNotice": "Benchmark AC-04 Active"
   },
   "nav": {
@@ -16,8 +17,10 @@
     "explorer3d": "3D Parcel Explorer",
     "transactions": "Transaction Explorer",
     "parcels": "Parcel Intelligence",
+    "parcelIntelligence": "Parcel Intelligence",
     "assessment": "AI Assessment",
     "reviewCases": "Review Workspace",
+    "reviewWorkspace": "Review Workspace",
     "reports": "Audit Reports",
     "settings": "Settings",
     "expand": "Expand navigation",
@@ -164,7 +167,11 @@
     "unverified": "Unverified",
     "pending": "Pending",
     "acres": "acres",
-    "na": "Not Available"
+    "na": "Not Available",
+    "noData": "No Data Available",
+    "audit": "Audit",
+    "export": "Export",
+    "filter": "Filter"
   },
   "home": {
     "heroTitle": "Your Land Information, Made Simple",
@@ -238,5 +245,48 @@
     "simple": "Simple Mode",
     "advanced": "Advanced Mode",
     "badge": "Mode Selector"
-  }
+  },
+  "dossier": {
+    "overview": "Dossier Overview",
+    "chainOfTitle": "Chain of Title",
+    "parcelId": "Parcel ID",
+    "areaTransferred": "Area Transferred",
+    "buyer": "Buyer",
+    "seller": "Seller",
+    "covered": "Active Coverage",
+    "noRecords": "No Coverage",
+    "activeCoverage": "Dataset Plots",
+    "activeCoverageDesc": "Synthetic cadastral polygons, ownership history, and deed anomaly screening active.",
+    "noCoverageTitle": "No Dataset Loaded for District",
+    "noCoverageDesc": "Select Dhaka, Chattogram, Rajshahi, or Khulna to view high-resolution plots.",
+    "benchmarkTitle": "Benchmark Case AC-04",
+    "groundTruth": "Ground Truth Conflict",
+    "targetPlot": "Target Parcel",
+    "competingDeed": "Competing Deed",
+    "findingsTitle": "Forensic Audit Findings",
+    "findingOverlap": "Identical acreage transferred twice by same seller alias",
+    "findingMutation": "Mutation record discrepancy detected (Status: PENDING)",
+    "findingDualML": "Dual ML anomaly consensus: RF 0.94, IF -0.18",
+    "auditBenchmark": "Audit Benchmark Case →"
+  },
+  "settings": {
+    "appearance": "Appearance & Theme",
+    "apiStatus": "API Connection Status",
+    "motion": "Motion & Animations"
+  },
+  "map": {
+    "midnight": "Midnight",
+    "satellite": "Satellite",
+    "survey": "Survey"
+  },
+  "Dhaka": "Dhaka",
+  "Chattogram": "Chattogram",
+  "Rajshahi": "Rajshahi",
+  "Khulna": "Khulna",
+  "a": "Record A",
+  "tx": "Transaction",
+  "parcel": "Parcel",
+  "scenario": "Scenario",
+  "mode": "Mode",
+  "offset": "Offset"
 }

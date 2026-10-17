@@ -18,7 +18,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Skeleton } from '../components/ui/Skeleton';
-import { ErrorState } from '../components/ui/ErrorState';
 import { CadastralMap } from '../components/gis/CadastralMap';
 import { AssetNetworkGraph } from '../components/gis/AssetNetworkGraph';
 import { Cadastral3DExplorer } from '../components/gis/Cadastral3DExplorer';
@@ -27,16 +26,25 @@ import { generateCadastralPolygon, CadastralPlotGeo } from '../lib/geo';
 export const ParcelHistoryPage: React.FC = () => {
   const { id = 'LG-P-002911' } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isBn = i18n.language === 'bn';
   const [targetId, setTargetId] = useState('');
   const [viewportMode, setViewportMode] = useState<'2d' | '3d'>('2d');
+
+  // Explicit canonical alias resolution: PARCEL-002911 -> LG-P-002911
+  React.useEffect(() => {
+    if (!id) return;
+    const cleanId = id.trim().toUpperCase();
+    if (cleanId.startsWith('PARCEL-')) {
+      const canonical = cleanId.replace('PARCEL-', 'LG-P-');
+      navigate(`/parcels/${canonical}`, { replace: true });
+    }
+  }, [id, navigate]);
 
   const {
     data,
     isLoading,
     isError,
-    error,
-    refetch,
   } = useQuery({
     queryKey: ['parcelHistory', id],
     queryFn: () => api.getParcelHistory(id),
@@ -46,7 +54,13 @@ export const ParcelHistoryPage: React.FC = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (targetId.trim()) {
-      navigate(`/parcels/${targetId.trim().toUpperCase()}`);
+      let clean = targetId.trim().toUpperCase();
+      if (clean.startsWith('PARCEL-')) {
+        clean = clean.replace('PARCEL-', 'LG-P-');
+      } else if (/^\d+$/.test(clean) && clean.length <= 6) {
+        clean = 'LG-P-' + clean.padStart(6, '0');
+      }
+      navigate(`/parcels/${clean}`);
       setTargetId('');
     }
   };
@@ -129,11 +143,56 @@ export const ParcelHistoryPage: React.FC = () => {
       </div>
 
       {isError ? (
-        <ErrorState
-          title={t('common.noData')}
-          message={error instanceof Error ? error.message : `Plot record ${id} not found.`}
-          onRetry={() => refetch()}
-        />
+        <div className="rounded-3xl border border-emerald-800/30 bg-emerald-950/20 dark:bg-[#062B22]/90 p-8 text-center max-w-xl mx-auto my-8 shadow-xl">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto mb-4 border border-amber-500/30">
+            <ShieldAlert className="w-7 h-7" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+            {isBn ? "জমির তথ্য পাওয়া যায়নি" : "Parcel Record Not Found"}
+          </h3>
+          <p className="text-sm text-slate-600 dark:text-emerald-200/80 mb-6 leading-relaxed">
+            {isBn 
+              ? `"${id}" আইডিতে কোনো নমুনা জমির তথ্য পাওয়া যায়নি। সঠিক দাগ নম্বর বা পার্সেল কোড দিয়ে আবার অনুসন্ধান করুন।`
+              : `No synthetic land record found for identifier "${id}". Please verify the Dag plot number or parcel ID.`}
+          </p>
+
+          <div className="p-4 rounded-2xl bg-white/60 dark:bg-[#031813]/80 border border-emerald-800/30 mb-6 text-left">
+            <span className="text-xs font-semibold text-emerald-800 dark:text-[#C4E8A5] block mb-2">
+              {isBn ? "প্রস্তাবিত নমুনা পার্সেলসমূহ:" : "Available Benchmark Parcels:"}
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {['LG-P-002911', 'LG-P-000001', 'LG-P-000002', 'LG-P-000104'].map((sampleId) => (
+                <button
+                  key={sampleId}
+                  type="button"
+                  onClick={() => navigate(`/parcels/${sampleId}`)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-emerald-600/20 hover:bg-emerald-600 text-emerald-800 dark:text-[#C4E8A5] hover:text-white border border-emerald-600/40 transition-colors"
+                >
+                  {sampleId}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/search')}
+              className="w-full sm:w-auto"
+            >
+              {isBn ? "ভূমি অনুসন্ধানে ফিরে যান" : "Back to Land Search"}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => navigate('/parcels/LG-P-002911')}
+              className="w-full sm:w-auto bg-emerald-700 hover:bg-emerald-800 text-white"
+            >
+              {isBn ? "নমুনা পার্সেল দেখুন (LG-P-002911)" : "View Benchmark (LG-P-002911)"}
+            </Button>
+          </div>
+        </div>
       ) : (
         <>
           {/* Top Section: Cadastral Survey Metric Cards */}

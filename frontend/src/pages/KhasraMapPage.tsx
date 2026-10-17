@@ -28,14 +28,14 @@ interface KhasraPlot {
 }
 
 const SCHEMATIC_PLOTS: KhasraPlot[] = [
-  { dag_no: "101", khatian_no: "KH-101", parcel_id: "PARCEL-002910", area_acres: 0.42, status: "clean", owner: "PERSON-0012", polygon: "M 40 40 L 180 30 L 190 150 L 50 160 Z", center: [115, 95] },
-  { dag_no: "102", khatian_no: "KH-102", parcel_id: "PARCEL-002911", area_acres: 0.55, status: "conflict", owner: "PERSON-0045", polygon: "M 180 30 L 340 45 L 350 170 L 190 150 Z", center: [265, 98] },
-  { dag_no: "103", khatian_no: "KH-103", parcel_id: "PARCEL-002912", area_acres: 0.38, status: "clean", owner: "PERSON-0088", polygon: "M 340 45 L 480 35 L 490 160 L 350 170 Z", center: [415, 102] },
-  { dag_no: "104", khatian_no: "KH-104", parcel_id: "PARCEL-002913", area_acres: 0.65, status: "review", owner: "PERSON-0105", polygon: "M 480 35 L 620 50 L 610 180 L 490 160 Z", center: [550, 106] },
-  { dag_no: "105", khatian_no: "KH-105", parcel_id: "PARCEL-002914", area_acres: 0.30, status: "clean", owner: "PERSON-0120", polygon: "M 50 160 L 190 150 L 180 290 L 40 280 Z", center: [115, 220] },
-  { dag_no: "106", khatian_no: "KH-106", parcel_id: "PARCEL-002915", area_acres: 0.48, status: "mismatch", owner: "PERSON-0134", polygon: "M 190 150 L 350 170 L 340 300 L 180 290 Z", center: [265, 228] },
-  { dag_no: "107", khatian_no: "KH-107", parcel_id: "PARCEL-002916", area_acres: 0.52, status: "clean", owner: "PERSON-0160", polygon: "M 350 170 L 490 160 L 480 295 L 340 300 Z", center: [415, 230] },
-  { dag_no: "108", khatian_no: "KH-108", parcel_id: "PARCEL-002917", area_acres: 0.70, status: "clean", owner: "PERSON-0182", polygon: "M 490 160 L 610 180 L 600 310 L 480 295 Z", center: [545, 236] }
+  { dag_no: "101", khatian_no: "KH-101", parcel_id: "LG-P-002910", area_acres: 0.42, status: "clean", owner: "PERSON-0012", polygon: "M 40 40 L 180 30 L 190 150 L 50 160 Z", center: [115, 95] },
+  { dag_no: "102", khatian_no: "KH-102", parcel_id: "LG-P-002911", area_acres: 0.55, status: "conflict", owner: "PERSON-0045", polygon: "M 180 30 L 340 45 L 350 170 L 190 150 Z", center: [265, 98] },
+  { dag_no: "103", khatian_no: "KH-103", parcel_id: "LG-P-002912", area_acres: 0.38, status: "clean", owner: "PERSON-0088", polygon: "M 340 45 L 480 35 L 490 160 L 350 170 Z", center: [415, 102] },
+  { dag_no: "104", khatian_no: "KH-104", parcel_id: "LG-P-002913", area_acres: 0.65, status: "review", owner: "PERSON-0105", polygon: "M 480 35 L 620 50 L 610 180 L 490 160 Z", center: [550, 106] },
+  { dag_no: "105", khatian_no: "KH-105", parcel_id: "LG-P-002914", area_acres: 0.30, status: "clean", owner: "PERSON-0120", polygon: "M 50 160 L 190 150 L 180 290 L 40 280 Z", center: [115, 220] },
+  { dag_no: "106", khatian_no: "KH-106", parcel_id: "LG-P-002915", area_acres: 0.48, status: "mismatch", owner: "PERSON-0134", polygon: "M 190 150 L 350 170 L 340 300 L 180 290 Z", center: [265, 228] },
+  { dag_no: "107", khatian_no: "KH-107", parcel_id: "LG-P-002916", area_acres: 0.52, status: "clean", owner: "PERSON-0160", polygon: "M 350 170 L 490 160 L 480 295 L 340 300 Z", center: [415, 230] },
+  { dag_no: "108", khatian_no: "KH-108", parcel_id: "LG-P-002917", area_acres: 0.70, status: "clean", owner: "PERSON-0182", polygon: "M 490 160 L 610 180 L 600 310 L 480 295 Z", center: [545, 236] }
 ];
 
 export const KhasraMapPage: React.FC = () => {
