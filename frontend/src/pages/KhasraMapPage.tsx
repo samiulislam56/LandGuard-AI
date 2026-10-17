@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Compass, 
   MapPin, 
@@ -11,12 +12,16 @@ import {
   Box,
   Search,
   Layers,
-  Sparkles
+  Sparkles,
+  Printer,
+  CheckCircle2
 } from 'lucide-react';
+import { api } from '../lib/api';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge, type BadgeVariant } from '../components/ui/Badge';
 import { CadastralMap } from '../components/gis/CadastralMap';
+import { ParcelPassportModal } from '../components/parcel/ParcelPassportModal';
 
 // Schematic plots layout for Aminbazar Mouza (Inspired by Reference 3 & 4)
 interface KhasraPlot {
@@ -48,6 +53,14 @@ const SURVEY_CORNER_STONES: [number, number][] = [
   [40, 280], [180, 290], [340, 300], [480, 295], [600, 310]
 ];
 
+// Real Source-Backed Benchmark Parcels from Synthetic Dataset
+const REAL_BENCHMARK_PARCELS = [
+  { id: 'LG-P-002911', district: 'Khulna', upazila: 'Dumuria', mouza: 'Raghunathpur', jl_no: 'JL-032', dag_no: '611', khatian_no: '1211', area_acres: 0.39, status: 'conflict', badgeBn: 'রিভিউ প্রয়োজন', labelBn: 'খুলনা • ডুমুরিয়া (LG-P-002911)' },
+  { id: 'LG-P-000004', district: 'Dhaka', upazila: 'Savar', mouza: 'Ashulia', jl_no: 'JL-005', dag_no: '104', khatian_no: '1004', area_acres: 1.456, status: 'clean', badgeBn: 'স্বাভাবিক', labelBn: 'ঢাকা • সাভার (LG-P-000004)' },
+  { id: 'LG-P-000002', district: 'Chattogram', upazila: 'Patiya', mouza: 'Haidgaon', jl_no: 'JL-001', dag_no: '102', khatian_no: '1002', area_acres: 2.872, status: 'clean', badgeBn: 'স্বাভাবিক', labelBn: 'চট্টগ্রাম • পটিয়া (LG-P-000002)' },
+  { id: 'LG-P-000001', district: 'Rajshahi', upazila: 'Paba', mouza: 'Haripur', jl_no: 'JL-082', dag_no: '101', khatian_no: '1001', area_acres: 0.452, status: 'clean', badgeBn: 'স্বাভাবিক', labelBn: 'রাজশাহী • পবা (LG-P-000001)' }
+];
+
 export const KhasraMapPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const isBn = i18n.language === 'bn';
@@ -56,6 +69,17 @@ export const KhasraMapPage: React.FC = () => {
 
   const [activeMode, setActiveMode] = useState<'schematic' | 'geo'>('schematic');
   const [searchDagQuery, setSearchDagQuery] = useState<string>('');
+  const [activeParcelId, setActiveParcelId] = useState<string>(() => initialParcel || 'LG-P-002911');
+  const [isPassportOpen, setIsPassportOpen] = useState<boolean>(false);
+
+  // Live Query for Real Backend Parcel History
+  const { data: realParcelHistory } = useQuery({
+    queryKey: ['khasraParcelHistory', activeParcelId],
+    queryFn: () => api.getParcelHistory(activeParcelId),
+    enabled: Boolean(activeParcelId && activeParcelId.startsWith('LG-P-')),
+    staleTime: 60000,
+  });
+
   const [selectedDag, setSelectedDag] = useState<string>(() => {
     if (initialParcel) {
       const match = SCHEMATIC_PLOTS.find(p => p.parcel_id === initialParcel);
@@ -90,8 +114,12 @@ export const KhasraMapPage: React.FC = () => {
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
               {isBn ? "ক্যাডাস্ট্রাল ম্যাপ ইন্টারফেস" : "Cadastral Map"}
             </span>
-            <span className="text-xs text-slate-500">
-              মৌজা: আমিনবাজার • সাভার, ঢাকা
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              {realParcelHistory?.parcel ? (
+                <>মৌজা: <strong>{realParcelHistory.parcel.mouza} ({realParcelHistory.parcel.jl_no})</strong> • {realParcelHistory.parcel.upazila}, {realParcelHistory.parcel.district} [বাস্তব সিন্থেটিক রেকর্ড]</>
+              ) : (
+                <>মৌজা: <strong>আশুলিয়া (JL-005)</strong> • সাভার, ঢাকা [নমুনা ডেমো এলাকা]</>
+              )}
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -138,16 +166,46 @@ export const KhasraMapPage: React.FC = () => {
         </p>
       </div>
 
+      {/* Real Source-Backed Benchmark Parcel Selector Strip */}
+      <div className="p-3 bg-emerald-50/60 dark:bg-emerald-950/40 rounded-2xl border border-emerald-500/20 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+            {isBn ? "বাস্তব সিন্থেটিক ডেটাসেট পার্সেল নির্বাচন:" : "Select Real Benchmark Parcel:"}
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {REAL_BENCHMARK_PARCELS.map((bp) => (
+            <button
+              key={bp.id}
+              type="button"
+              onClick={() => {
+                setActiveParcelId(bp.id);
+                const match = SCHEMATIC_PLOTS.find(p => p.parcel_id === bp.id);
+                if (match) setSelectedDag(match.dag_no);
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                activeParcelId === bp.id
+                  ? 'bg-emerald-700 text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/40 scale-105'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-500'
+              }`}
+            >
+              <span>{bp.labelBn}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Interactive Dag Quick Switcher & Search Bar */}
       <div className="p-3 bg-white dark:bg-slate-850 rounded-2xl border border-emerald-800/20 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Left: Quick search input */}
-        <div className="relative min-w-[220px]">
+        <div className="relative min-w-[240px]">
           <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
           <input
             type="text"
             value={searchDagQuery}
             onChange={(e) => setSearchDagQuery(e.target.value)}
-            placeholder={isBn ? "দাগ নম্বর খুঁজুন (যেমন: ১০২)..." : "Search Dag (e.g. 102)..."}
+            placeholder={isBn ? "দাগ বা পার্সেল খুঁজুন (যেমন: LG-P-002911)..." : "Search Dag or Parcel..."}
             className="w-full text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-inner"
           />
         </div>
@@ -165,7 +223,10 @@ export const KhasraMapPage: React.FC = () => {
               <button
                 key={plot.dag_no}
                 type="button"
-                onClick={() => setSelectedDag(plot.dag_no)}
+                onClick={() => {
+                  setSelectedDag(plot.dag_no);
+                  setActiveParcelId(plot.parcel_id);
+                }}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 shadow-sm ${
                   isSelected
                     ? 'bg-amber-400 dark:bg-amber-500 text-slate-950 ring-2 ring-amber-500 scale-105'
@@ -189,10 +250,14 @@ export const KhasraMapPage: React.FC = () => {
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3 px-2">
               <div>
                 <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider block">
-                  মৌজা মানচিত্র স্কেচ • সীমানা বেড় ও পিলার
+                  মৌজা নকশা স্কেচ • সীমানা বেড় ও পিলার
                 </span>
                 <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
-                  আমিনবাজার (JL 45), সাভার
+                  {realParcelHistory?.parcel ? (
+                    `${realParcelHistory.parcel.mouza} (${realParcelHistory.parcel.jl_no}), ${realParcelHistory.parcel.upazila}`
+                  ) : (
+                    'আশুলিয়া (JL-005), সাভার'
+                  )}
                 </span>
               </div>
 
@@ -254,7 +319,7 @@ export const KhasraMapPage: React.FC = () => {
                   opacity="0.8"
                 />
                 <text x="330" y="324" fill="#047857" fontSize="10" fontWeight="bold" textAnchor="middle">
-                  {isBn ? "আমিনবাজার মৌজা বহিঃসীমানা বেড় (Mouza Boundary Ridge)" : "Mouza Boundary Ridge"}
+                  {realParcelHistory?.parcel ? `${realParcelHistory.parcel.mouza} মৌজা বহিঃসীমানা বেড়` : (isBn ? "আশুলিয়া মৌজা বহিঃসীমানা বেড় (Mouza Boundary Ridge)" : "Mouza Boundary Ridge")}
                 </text>
 
                 {/* Parcel Polygons with High-Contrast Boundary Borders ("জমির বেড়") */}
@@ -263,7 +328,10 @@ export const KhasraMapPage: React.FC = () => {
                   const isSelected = selectedDag === plot.dag_no;
 
                   return (
-                    <g key={plot.dag_no} onClick={() => setSelectedDag(plot.dag_no)} className="cursor-pointer group">
+                    <g key={plot.dag_no} onClick={() => {
+                      setSelectedDag(plot.dag_no);
+                      setActiveParcelId(plot.parcel_id);
+                    }} className="cursor-pointer group">
                       {/* Outer Glowing Border Aura for Selected Plot */}
                       {isSelected && (
                         <path
@@ -335,7 +403,7 @@ export const KhasraMapPage: React.FC = () => {
             </p>
           </Card>
 
-          {/* Plot Inspector Panel */}
+          {/* Plot Inspector Panel with Real Backend Data */}
           <Card className="p-6 bg-white dark:bg-slate-800 shadow-md border-emerald-800/20 rounded-2xl flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
@@ -344,30 +412,57 @@ export const KhasraMapPage: React.FC = () => {
                     {t('khasra.inspectPlot', 'পার্সেল তথ্য ও ইতিহাস')}
                   </span>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-0.5">
-                    {isBn ? "দাগ নং:" : "Dag No:"} {selectedPlot.dag_no}
+                    {isBn ? "দাগ নং:" : "Dag No:"} {realParcelHistory?.parcel ? realParcelHistory.parcel.dag_no : selectedPlot.dag_no}
                   </h3>
                 </div>
-                <Badge variant={getStatusColor(selectedPlot.status).badge}>
-                  {getStatusColor(selectedPlot.status).label}
-                </Badge>
+                <div className="flex flex-col items-end gap-1">
+                  <Badge variant={getStatusColor(selectedPlot.status).badge}>
+                    {getStatusColor(selectedPlot.status).label}
+                  </Badge>
+                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                    {realParcelHistory?.parcel ? 'বাস্তব সিন্থেটিক রেকর্ড' : 'ধারণামূলক ডায়াগ্রাম'}
+                  </span>
+                </div>
               </div>
 
               <div className="mt-4 space-y-3 text-sm">
                 <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
                   <span className="text-slate-500">{isBn ? "পার্সেল আইডি:" : "Parcel ID:"}</span>
-                  <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">{selectedPlot.parcel_id}</span>
+                  <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+                    {realParcelHistory?.parcel ? realParcelHistory.parcel.parcel_id : selectedPlot.parcel_id}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                  <span className="text-slate-500">{isBn ? "অবস্থান / মৌজা:" : "Location / Mouza:"}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs">
+                    {realParcelHistory?.parcel 
+                      ? `${realParcelHistory.parcel.mouza} (${realParcelHistory.parcel.jl_no}), ${realParcelHistory.parcel.upazila}, ${realParcelHistory.parcel.district}` 
+                      : 'আশুলিয়া (JL-005), সাভার, ঢাকা'}
+                  </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
                   <span className="text-slate-500">{isBn ? "খতিয়ান নং:" : "Khatian No:"}</span>
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedPlot.khatian_no}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {realParcelHistory?.parcel ? realParcelHistory.parcel.khatian_no : selectedPlot.khatian_no}
+                  </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
                   <span className="text-slate-500">{isBn ? "মোট এলাকা:" : "Total Acreage:"}</span>
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedPlot.area_acres} {isBn ? "একর" : "acres"}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {realParcelHistory?.parcel ? realParcelHistory.parcel.total_area_acres : selectedPlot.area_acres} {isBn ? "একর" : "acres"}
+                  </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
-                  <span className="text-slate-500">{isBn ? "রেকর্ডীয় মালিক:" : "Recorded Owner:"}</span>
-                  <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700">{selectedPlot.owner}</span>
+                  <span className="text-slate-500">{isBn ? "নথিভুক্ত লেনদেন:" : "Transactions:"}</span>
+                  <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 font-bold">
+                    {realParcelHistory?.transactions ? `${realParcelHistory.transactions.length} টি দলিল` : '৩ টি দলিল'}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                  <span className="text-slate-500">{isBn ? "ডেটা অরিজিন:" : "Data Origin:"}</span>
+                  <span className="font-mono text-xs px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
+                    SYNTHETIC (উৎস-সমর্থিত)
+                  </span>
                 </div>
               </div>
 
@@ -387,13 +482,21 @@ export const KhasraMapPage: React.FC = () => {
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsPassportOpen(true)}
+                className="w-full gap-2 justify-center border-emerald-600/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold"
+              >
+                <Printer className="w-4 h-4 text-emerald-600" />
+                {isBn ? "পার্সেল পাসপোর্ট প্রিন্ট" : "Print Parcel Passport"}
+              </Button>
               <Link to={`/rmd?tx=TX-002911-2`} className="block">
                 <Button variant="primary" className="w-full gap-2 justify-center bg-emerald-700 hover:bg-emerald-800">
                   <Scale className="w-4 h-4" />
                   {isBn ? "RMD ত্রিভুজ অডিট দেখুন" : "Open RMD Audit"}
                 </Button>
               </Link>
-              <Link to={`/parcels/${selectedPlot.parcel_id}`} className="block">
+              <Link to={`/parcels/${realParcelHistory?.parcel ? realParcelHistory.parcel.parcel_id : selectedPlot.parcel_id}`} className="block">
                 <Button variant="outline" className="w-full gap-2 justify-center">
                   <FileText className="w-4 h-4" />
                   {isBn ? "সম্পূর্ণ দলিল ইতিহাস" : "Deed History"}
@@ -421,13 +524,33 @@ export const KhasraMapPage: React.FC = () => {
               </p>
             </div>
             <span className="text-xs text-slate-400">
-              Google Maps / Leaflet GIS
+              Esri Dark Canvas / Leaflet GIS
             </span>
           </div>
 
           <CadastralMap height="520px" />
         </Card>
       )}
+
+      {/* Printable Parcel Passport Modal */}
+      <ParcelPassportModal
+        isOpen={isPassportOpen}
+        onClose={() => setIsPassportOpen(false)}
+        parcel={
+          realParcelHistory?.parcel || {
+            parcel_id: activeParcelId,
+            district: 'Khulna',
+            upazila: 'Dumuria',
+            mouza: 'Raghunathpur',
+            jl_no: 'JL-032',
+            dag_no: 611,
+            khatian_no: 1211,
+            total_area_acres: 0.39,
+            scenario: 'conflicting_sale'
+          }
+        }
+        transactionCount={realParcelHistory?.transactions?.length || 3}
+      />
     </div>
   );
 };

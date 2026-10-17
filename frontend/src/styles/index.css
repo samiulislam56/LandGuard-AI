@@ -48,18 +48,29 @@
 }
 
 @layer utilities {
-  /* Subtle cadastral plot grid overlay */
-  .cadastral-grid {
-    background-size: 24px 24px;
-    background-image: 
-      linear-gradient(to right, rgba(22, 61, 60, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(22, 61, 60, 0.05) 1px, transparent 1px);
+  /* =========================================================================
+     SURVEY PAPER × BOTANICAL LANDTECH CARTOGRAPHIC BACKGROUND
+     Ivory survey paper with subtle topographic contour lines (Light Mode)
+     Deep botanical forest green with terrain contour accents (Dark Mode)
+     ========================================================================= */
+  .cadastral-grid,
+  .survey-paper-bg {
+    background-color: #F8F9F5;
+    background-image:
+      radial-gradient(ellipse at 15% 20%, rgba(14, 141, 96, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 75%, rgba(215, 182, 119, 0.05) 0%, transparent 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cpath d='M0 80 Q40 40 80 80 T160 80 M0 120 Q40 80 80 120 T160 120 M0 40 Q40 0 80 40 T160 40 M0 160 Q40 120 80 160 T160 160' fill='none' stroke='%230E8D60' stroke-width='0.6' stroke-opacity='0.035'/%3E%3Cpath d='M20 0 Q60 40 100 0 T180 0 M20 80 Q60 120 100 80 T180 80' fill='none' stroke='%23D7B677' stroke-width='0.4' stroke-opacity='0.03'/%3E%3C/svg%3E");
+    background-repeat: repeat;
   }
 
-  .dark .cadastral-grid {
-    background-image: 
-      linear-gradient(to right, rgba(37, 182, 160, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(37, 182, 160, 0.05) 1px, transparent 1px);
+  .dark .cadastral-grid,
+  .dark .survey-paper-bg {
+    background-color: #051813;
+    background-image:
+      radial-gradient(ellipse at 15% 20%, rgba(14, 141, 96, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 85% 75%, rgba(215, 182, 119, 0.05) 0%, transparent 60%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cpath d='M0 80 Q40 40 80 80 T160 80 M0 120 Q40 80 80 120 T160 120 M0 40 Q40 0 80 40 T160 40 M0 160 Q40 120 80 160 T160 160' fill='none' stroke='%2325B6A0' stroke-width='0.6' stroke-opacity='0.05'/%3E%3Cpath d='M20 0 Q60 40 100 0 T180 0 M20 80 Q60 120 100 80 T180 80' fill='none' stroke='%23D7B677' stroke-width='0.5' stroke-opacity='0.04'/%3E%3C/svg%3E");
+    background-repeat: repeat;
   }
 
   /* Custom institutional scrollbars */

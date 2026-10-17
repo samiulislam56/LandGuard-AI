@@ -219,14 +219,14 @@ export const HomePage: React.FC = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4.5">
           {serviceTiles.map((tile) => {
             const Icon = tile.icon;
             return (
               <Link
                 key={tile.id}
                 to={tile.to}
-                className="group block rounded-2xl bg-white dark:bg-[#071D16] p-5 border border-slate-200 dark:border-emerald-500/20 shadow-sm hover:shadow-xl hover:border-emerald-500/60 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+                className="group block rounded-2xl bg-white dark:bg-[#071D16] p-5 border border-slate-200 dark:border-emerald-500/20 shadow-sm hover:shadow-xl hover:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between min-h-[195px]"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3.5">
@@ -241,14 +241,14 @@ export const HomePage: React.FC = () => {
                   <h3 className="font-bold text-slate-900 dark:text-white text-sm group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
                     {tile.title}
                   </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed font-normal">
                     {tile.desc}
                   </p>
                 </div>
 
-                <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-emerald-900/30 flex items-center justify-between text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-emerald-900/30 flex items-center justify-between text-xs font-bold text-emerald-700 dark:text-emerald-400">
                   <span>{isBn ? "প্রবেশ করুন" : "Open"}</span>
-                  <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform" />
                 </div>
               </Link>
             );

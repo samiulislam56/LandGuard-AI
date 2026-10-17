@@ -101,22 +101,25 @@ export const CadastralMap: React.FC<CadastralMapProps> = ({
     let url = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
     let attribution = '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ';
     let maxZoom = 18;
+    let maxNativeZoom = 16; // Esri Canvas Dark Base native zoom is 16; Leaflet auto-upscales for 17-18 without 404s
 
     if (layer === 'satellite') {
       // Safe Esri World Imagery
       url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
       attribution = '&copy; Esri &mdash; High-Resolution Satellite';
       maxZoom = 18;
+      maxNativeZoom = 18;
     } else if (layer === 'survey') {
       url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
       attribution = '&copy; OpenStreetMap contributors';
       maxZoom = 18;
+      maxNativeZoom = 19;
     }
 
     const newTileLayer = L.tileLayer(url, {
       attribution,
       maxZoom,
-      maxNativeZoom: 18,
+      maxNativeZoom,
       crossOrigin: true,
     });
 

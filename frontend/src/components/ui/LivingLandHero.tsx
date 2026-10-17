@@ -77,24 +77,25 @@ export const LivingLandHero: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-3 pt-2">
+        {/* Action Buttons with High-Contrast Accessible Styling */}
+        <div className="flex flex-wrap items-center gap-3.5 pt-2">
           <Link to="/search">
             <Button
-              className="px-6 py-3.5 rounded-2xl bg-[#0E8D60] hover:bg-emerald-600 text-white font-bold text-sm sm:text-base flex items-center gap-2 shadow-lg shadow-emerald-950/50 transition-all"
+              className="min-h-[48px] px-6 py-3 rounded-2xl bg-[#0E8D60] hover:bg-emerald-600 active:bg-emerald-700 text-white font-extrabold text-sm sm:text-base flex items-center gap-2.5 shadow-lg shadow-emerald-950/60 focus:ring-2 focus:ring-emerald-400 focus:outline-none transition-all"
             >
-              <Search className="w-5 h-5" />
+              <Search className="w-5 h-5 text-emerald-100" />
               <span>সহজে জমি খুঁজুন</span>
             </Button>
           </Link>
 
           <Link to="/khasra-map">
-            <Button
-              variant="outline"
-              className="px-6 py-3.5 rounded-2xl border-emerald-500/40 hover:bg-emerald-950/60 text-[#C4E8A5] font-bold text-sm sm:text-base flex items-center gap-2 backdrop-blur-sm transition-all"
+            <button
+              type="button"
+              className="min-h-[48px] px-6 py-3 rounded-2xl bg-white/15 hover:bg-white/25 active:bg-white/30 text-white font-extrabold text-sm sm:text-base flex items-center gap-2.5 border-2 border-white/60 hover:border-white shadow-lg backdrop-blur-md focus:ring-2 focus:ring-white focus:outline-none transition-all"
             >
-              <Compass className="w-5 h-5" />
+              <Compass className="w-5 h-5 text-[#C4E8A5]" />
               <span>খসড়া ম্যাপ দেখুন</span>
-            </Button>
+            </button>
           </Link>
         </div>
 
