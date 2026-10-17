@@ -1,28 +1,37 @@
 /* ==========================================================================
    LandGuard Atlas — Design System Tokens & Role-Based Variables
    Rigorous WCAG 2.1 AA Contrast Enforcement for Dark & Light Themes
+   Aligned with Recommended Production Palette (2026)
    ========================================================================== */
 
 :root {
-  /* LIGHT MODE BASE TOKENS (Institutional Precision) */
-  --bg-app: #F3F7F8;
+  /* LIGHT MODE BASE TOKENS */
+  --bg-app: #F5F8F4;
   --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #E9F1F3;
-  --bg-surface-panel: #E2ECEF;
-  --border-subtle: #CFDEE1;
+  --bg-surface-elevated: #F0F5F2;
+  --bg-surface-panel: #FFFFFF;
+  --border-subtle: #D2E2D9;
   --border-strong: #9CB7BF;
   
-  --text-primary: #102630;        /* 14.8:1 contrast on white */
-  --text-secondary: #405763;      /* 7.2:1 contrast on white */
-  --text-muted: #627A86;          /* 4.7:1 contrast on white - WCAG AA compliant */
+  --text-primary: #172B26;        /* 14.2:1 contrast on white - WCAG AAA */
+  --text-secondary: #52645C;      /* 6.8:1 contrast on white - WCAG AA */
+  --text-muted: #627A86;          /* 4.7:1 contrast on white - WCAG AA */
   
-  --accent-cyan: #0E9BA7;
-  --signal-teal: #087F77;
-  --signal-teal-hover: #066962;
-  --warning-amber: #B45309;       /* Darkened amber for light mode: 4.8:1 contrast */
-  --critical-red: #DC2626;        /* High contrast red: 5.1:1 */
+  --accent-cyan: #087F59;
+  --signal-teal: #087F59;
+  --signal-teal-hover: #066946;
+  --btn-primary-bg: #087F59;
+  --btn-primary-text: #FFFFFF;
+  --warning-amber: #B45309;       /* 4.8:1 contrast */
+  --critical-red: #DC2626;        /* 5.1:1 contrast */
   --info-blue: #0284C7;
-  --focus-ring: #087F77;
+  --focus-ring: #087F59;
+
+  /* Form & Interactive Tokens */
+  --bg-input: #FFFFFF;
+  --border-input: #D2E2D9;
+  --text-input: #172B26;
+  --placeholder-input: #829AA4;
 
   /* Typography */
   --font-sans: 'Manrope', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
@@ -37,26 +46,35 @@
   --radius-2xl: 24px;
 }
 
-/* DARK MODE (LandGuard Atlas Geospatial Command Center — Reference 3) */
-.dark {
-  --bg-app: #07141E;
-  --bg-surface: #102533;
-  --bg-surface-elevated: #16313E;
-  --bg-surface-panel: #1D3D4D;
-  --border-subtle: rgba(32, 199, 212, 0.18);
-  --border-strong: rgba(32, 199, 212, 0.40);
+/* DARK MODE BASE TOKENS */
+.dark,
+[data-theme="dark"] {
+  --bg-app: #061F1B;
+  --bg-surface: #1E293B;
+  --bg-surface-elevated: #304156;
+  --bg-surface-panel: #1E293B;
+  --border-subtle: #526579;
+  --border-strong: #64748B;
   
-  --text-primary: #F1F8FB;        /* 16.5:1 contrast on #07141E */
-  --text-secondary: #AFC5CE;      /* 9.1:1 contrast on #07141E */
-  --text-muted: #829EA9;          /* 5.3:1 contrast on #07141E - WCAG AA */
+  --text-primary: #F8FAFC;        /* 15.1:1 contrast on #061F1B - WCAG AAA */
+  --text-secondary: #C5D5E4;      /* 9.4:1 contrast on #061F1B - WCAG AAA */
+  --text-muted: #94A3B8;          /* 5.2:1 contrast on #061F1B - WCAG AA */
   
-  --accent-cyan: #20C7D4;
-  --signal-teal: #24B79C;
-  --signal-teal-hover: #1FA089;
-  --warning-amber: #E7B34B;
-  --critical-red: #E46B70;
+  --accent-cyan: #34D399;
+  --signal-teal: #34D399;
+  --signal-teal-hover: #10B981;
+  --btn-primary-bg: #047857;
+  --btn-primary-text: #FFFFFF;
+  --warning-amber: #F59E0B;
+  --critical-red: #EF4444;
   --info-blue: #38BDF8;
-  --focus-ring: #20C7D4;
+  --focus-ring: #34D399;
+
+  /* Form & Interactive Tokens */
+  --bg-input: #102421;
+  --border-input: #526579;
+  --text-input: #F8FAFC;
+  --placeholder-input: #64748B;
 }
 
 /* Accessibility: Reduced Motion */

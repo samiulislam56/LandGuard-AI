@@ -50,6 +50,9 @@ export default {
           goldLight: '#E8CA94',
           ivory: '#F5F8F2',
           ivoryMuted: '#E5EDE0',
+        },
+        slate: {
+          850: '#304156',
         }
       },
       fontFamily: {

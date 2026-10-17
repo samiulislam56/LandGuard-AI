@@ -14,6 +14,7 @@ import {
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { LandGuardEasySearch } from '../components/search/LandGuardEasySearch';
+import { CadastralMotionBackground } from '../components/ui/CadastralMotionBackground';
 
 interface DivisionData {
   name_bn: string;
@@ -246,11 +247,13 @@ export const SearchPage: React.FC = () => {
 
       {/* Render Easy Search Mode or Advanced Mode */}
       {searchMode === 'easy' ? (
-        <LandGuardEasySearch onSwitchToAdvanced={() => setSearchMode('advanced')} />
+        <CadastralMotionBackground variant="surface" className="rounded-3xl p-1 sm:p-2">
+          <LandGuardEasySearch onSwitchToAdvanced={() => setSearchMode('advanced')} />
+        </CadastralMotionBackground>
       ) : (
         <>
           {/* Cascading Search Card (Reference 1 Style) */}
-          <Card className="p-6 md:p-8 bg-white dark:bg-slate-800 border-emerald-800/10 dark:border-emerald-500/20 shadow-md rounded-2xl">
+          <Card className="p-6 md:p-8 bg-white dark:bg-[#1E293B] border border-[#D2E2D9] dark:border-[#526579] shadow-md rounded-2xl">
         <form
           onSubmit={(e) => {
             e.preventDefault();
