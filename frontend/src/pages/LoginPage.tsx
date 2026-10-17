@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
@@ -26,12 +26,15 @@ export const LoginPage: React.FC = () => {
   const { i18n } = useTranslation();
   const isBn = i18n.language === 'bn';
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
 
-  // Mode: 'signup' (Register) or 'login' (Sign In)
-  const initialMode = searchParams.get('mode') === 'login' ? 'login' : 'signup';
-  const [activeTab, setActiveTab] = useState<'signup' | 'login'>(initialMode);
+  // Mode: 'signup' (Register) or 'login' (Sign In) based on route and query param
+  const isLoginRoute = location.pathname === '/login' || searchParams.get('mode') === 'login';
+  const [tabOverride, setTabOverride] = useState<'signup' | 'login' | null>(null);
+  const activeTab = tabOverride ?? (isLoginRoute ? 'login' : 'signup');
+  const setActiveTab = (tab: 'signup' | 'login') => setTabOverride(tab);
 
   // Form states
   const [name, setName] = useState('');
