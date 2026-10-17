@@ -10,7 +10,6 @@ import {
   ClipboardCheck, 
   Download, 
   ArrowRight, 
-  ShieldCheck, 
   Sparkles,
   Info,
   Compass,
@@ -24,6 +23,7 @@ import {
 import { api } from '../lib/api';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { LivingLandHero } from '../components/ui/LivingLandHero';
 
 export const HomePage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -139,95 +139,9 @@ export const HomePage: React.FC = () => {
     <div className="space-y-10 max-w-7xl mx-auto pb-20">
       
       {/* ========================================================================= */}
-      {/* 1. AGRICULTURAL LAND BANNER (Screenshot 5 Preserved with Image 1 Styling) */}
+      {/* 1. LIVING LAND BOTANICAL HERO (Gentle Parallax & Animated Cadastral Motif) */}
       {/* ========================================================================= */}
-      <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-emerald-500/20 bg-[#071D16]">
-        {/* Background Image Container */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
-          style={{ backgroundImage: `url('/assets/images/hero-bg.jpg')` }}
-        />
-        {/* Deep Emerald Forest Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#04120D]/95 via-[#061A13]/85 to-transparent dark:from-[#020B08]/95 dark:via-[#04120D]/85" />
-
-        {/* Banner Content */}
-        <div className="relative z-10 px-6 py-12 md:py-16 lg:px-12 max-w-3xl text-white space-y-5">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-900/80 backdrop-blur-md border border-emerald-400/40 text-emerald-200 text-xs font-semibold shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-            <span>{isBn ? "স্মার্ট ক্যাডাস্ট্রাল ইন্টেলিজেন্স ড্যাশবোর্ড" : "Smart Cadastral Intelligence Command Dashboard"}</span>
-          </div>
-
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-            {isBn ? (
-              <>
-                আপনার জমির তথ্য, <br />
-                <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-green-300 bg-clip-text text-transparent">
-                  নিরাপদ ও সহজে পর্যালোচনা করুন
-                </span>
-              </>
-            ) : (
-              <>
-                Your Land Records, <br />
-                <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-green-300 bg-clip-text text-transparent">
-                  Verified & Screened with AI
-                </span>
-              </>
-            )}
-          </h1>
-
-          <p className="text-sm md:text-base text-emerald-100/90 leading-relaxed font-normal">
-            {isBn 
-              ? "মৌজা ও দাগ নম্বর দিয়ে সংরক্ষিত রেকর্ড খুঁজুন, খতিয়ান-নামজারি-দলিল (RMD) ধারাবাহিকতা বুঝুন এবং সম্ভাব্য অসংগতি এআই মডেলের সহায়তায় মূল্যায়ন করুন।"
-              : "Search Mouza and Dag records, verify Record-Mutation-Deed chain of title, and screen conflicting transfers with explainable AI models."}
-          </p>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3.5 pt-2">
-            <Link to="/search">
-              <Button 
-                variant="primary" 
-                size="md" 
-                className="gap-2 px-6 py-3 text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-950/60 transform hover:-translate-y-0.5 transition-all"
-              >
-                <Search className="w-4 h-4" />
-                <span>{isBn ? "জমির তথ্য খুঁজুন" : "Find Land Records"}</span>
-              </Button>
-            </Link>
-
-            <Link to="/khasra-map">
-              <Button 
-                variant="outline" 
-                size="md" 
-                className="gap-2 px-6 py-3 text-sm font-medium border-emerald-400/40 text-emerald-100 bg-emerald-950/60 hover:bg-emerald-900/80 backdrop-blur-md rounded-xl transition-all"
-              >
-                <Compass className="w-4 h-4 text-amber-300" />
-                <span>{isBn ? "ডিজিটাল খসড়া ম্যাপ" : "Cadastral Map"}</span>
-              </Button>
-            </Link>
-
-            <Link to="/explorer-3d">
-              <Button 
-                variant="outline" 
-                size="md" 
-                className="gap-2 px-6 py-3 text-sm font-medium border-teal-500/40 text-teal-200 bg-teal-950/50 hover:bg-teal-900/70 backdrop-blur-md rounded-xl transition-all"
-              >
-                <Box className="w-4 h-4 text-teal-300" />
-                <span>{isBn ? "৩ডি এক্সপ্লোরার" : "3D Explorer"}</span>
-              </Button>
-            </Link>
-          </div>
-
-          {/* Synthetic Demo Assurance Tag */}
-          <div className="pt-3 border-t border-emerald-500/20 flex items-center gap-2.5 text-xs text-emerald-300">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>
-              {isBn
-                ? "উন্মুক্ত সিন্থেটিক ডেটাসেট: আপনি কোনো পাসওয়ার্ড ছাড়াই সমস্ত ডেমো রেকর্ড পর্যালোচনা করতে পারবেন।"
-                : "Open synthetic records: Inspect all demonstration parcels and transaction assessments freely."}
-            </span>
-          </div>
-        </div>
-      </div>
+      <LivingLandHero />
 
       {/* ========================================================================= */}
       {/* 2. LIVE METRICS SUMMARY BAR (Real Backend Counts)                         */}

@@ -23,6 +23,8 @@ import { Badge, getStatusBadgeVariant } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Skeleton } from '../components/ui/Skeleton';
 import { ErrorState } from '../components/ui/ErrorState';
+import { UnderstandMyResult } from '../components/assessment/UnderstandMyResult';
+import { SmartDocumentChecklist } from '../components/assessment/SmartDocumentChecklist';
 
 export const AssessmentPage: React.FC = () => {
   const { id = 'TX-002911-2' } = useParams<{ id: string }>();
@@ -219,57 +221,20 @@ export const AssessmentPage: React.FC = () => {
         />
       ) : (
         <>
-          {/* Simple Mode Citizen Card */}
-          {experienceMode === 'simple' && (
-            <div className="p-6 rounded-2xl border bg-white dark:bg-slate-800 border-emerald-800/20 shadow-md space-y-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                    {isBn ? "সহজ মূল্যায়ন ফলাফল" : "Plain-Language Assessment"}
-                  </span>
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-                    {finalStatus === 'REVIEW_REQUIRED'
-                      ? (isBn ? "পর্যালোচনা প্রয়োজন (সতর্কতা)" : "Review Required")
-                      : finalStatus === 'INSUFFICIENT_EVIDENCE'
-                      ? (isBn ? "তথ্য অসম্পূর্ণ" : "Insufficient Evidence")
-                      : finalStatus === 'PENDING_DATE_VERIFICATION'
-                      ? (isBn ? "তারিখ যাচাই প্রয়োজন" : "Pending Date Verification")
-                      : (isBn ? "কোনো দৃশ্যমান অসংগতি পাওয়া যায়নি" : "Clean Record")}
-                  </h2>
-                </div>
-                <Badge variant={getStatusBadgeVariant(finalStatus)} size="md" className="text-sm px-3.5 py-1 font-bold">
-                  {finalStatus}
-                </Badge>
-              </div>
-
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
-                {finalStatus === 'REVIEW_REQUIRED' ? (
-                  <p>
-                    {isBn 
-                      ? "এই দলিলের বিক্রেতার সাথে খতিয়ানের পূর্বতন মালিকানার মিল পাওয়া যায়নি অথবা নামজারি নথির অসংগতি রয়েছে। জমি ক্রয়ের পূর্বে সহকারী কমিশনার (ভূমি) অফিস বা সাব-রেজিস্ট্রার কার্যালয় থেকে বায়া দলিল যাচাই করার পরামর্শ দেওয়া হচ্ছে।"
-                      : "The seller named in this deed does not match recorded ownership history, or mutation records show inconsistencies. Prior deed verification is strongly recommended."}
-                  </p>
-                ) : finalStatus === 'INSUFFICIENT_EVIDENCE' ? (
-                  <p>
-                    {isBn 
-                      ? "লেনদেনের প্রয়োজনীয় সহায়ক নথিপত্র এবং রেকর্ডীয় তথ্য অসম্পূর্ণ থাকায় চূড়ান্ত স্ক্রিনিং সম্ভব হয়নি।"
-                      : "Supporting documents and recorded ownership lineage are incomplete. Further records are required."}
-                  </p>
-                ) : finalStatus === 'PENDING_DATE_VERIFICATION' ? (
-                  <p>
-                    {isBn 
-                      ? "মূল্যায়ন তারিখের তুলনায় দলিলের তারিখ ভবিষ্যৎ সময় নির্দেশ করছে। তারিখ যাচাই প্রয়োজন।"
-                      : "Transaction date is recorded as posterior to the current assessment reference date."}
-                  </p>
-                ) : (
-                  <p>
-                    {isBn 
-                      ? "প্রাথমিক পর্যালোচনায় এই লেনদেনের ক্ষেত্রে কোনো প্রকাশ্য দ্বৈত-বিক্রয় সংকেত বা মালিকানা অসংগতি পরিলক্ষিত হয়নি।"
-                      : "No conflicting double-selling flags or title ownership mismatches were identified."}
-                  </p>
-                )}
-              </div>
-
+          {/* Simple Mode: Understand My Result & Smart Document Checklist */}
+          {experienceMode === 'simple' && assessment && (
+            <div className="space-y-6">
+              <UnderstandMyResult assessment={assessment} />
+              <SmartDocumentChecklist
+                transactionId={id}
+                hasDeedRecord={true}
+                hasKhatianRecord={true}
+                hasMutationRecord={finalStatus !== 'INSUFFICIENT_EVIDENCE'}
+                isAreaConsistent={finalStatus !== 'REVIEW_REQUIRED'}
+                isLineageConsistent={finalStatus !== 'REVIEW_REQUIRED'}
+                isDateValid={finalStatus !== 'PENDING_DATE_VERIFICATION'}
+                sellerRepeatCount={finalStatus === 'REVIEW_REQUIRED' ? 3 : 1}
+              />
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link to={`/rmd?tx=${id}`}>
                   <Button variant="primary" size="sm" className="gap-2 bg-emerald-700 hover:bg-emerald-800">
@@ -277,12 +242,14 @@ export const AssessmentPage: React.FC = () => {
                     {isBn ? "RMD ধারাবাহিকতা অডিট দেখুন" : "View RMD Triangulation"}
                   </Button>
                 </Link>
-                <Link to={`/parcels/${assessment?.parcel_id}`}>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Layers className="w-4 h-4" />
-                    {isBn ? "জমির ইতিহাস দেখুন" : "View Parcel History"}
-                  </Button>
-                </Link>
+                {assessment.parcel_id && (
+                  <Link to={`/parcels/${assessment.parcel_id}`}>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Layers className="w-4 h-4" />
+                      {isBn ? "জমির ইতিহাস দেখুন" : "View Parcel History"}
+                    </Button>
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={() => setExperienceMode('advanced')}

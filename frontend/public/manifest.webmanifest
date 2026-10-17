@@ -1,0 +1,40 @@
+{
+  "name": "LandGuard AI — ভূমি তথ্য ও লেনদেন স্ক্রিনিং প্ল্যাটফর্ম",
+  "short_name": "LandGuard AI",
+  "description": "Bangladesh Land Intelligence & Transaction Screening Platform | Smart Cadastral Verification & Explainable Forensic Assessment",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#062B22",
+  "theme_color": "#062B22",
+  "categories": ["productivity", "utilities", "government"],
+  "lang": "bn",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

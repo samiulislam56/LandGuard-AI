@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" fill="none">
+  <rect width="192" height="192" rx="42" fill="#062B22"/>
+  <rect x="8" y="8" width="176" height="176" rx="34" stroke="#0E8D60" stroke-width="3" stroke-opacity="0.4"/>
+  
+  <!-- Outer Cadastral Hexagonal Boundary Motif -->
+  <path d="M42 66L96 36L150 66V126L96 156L42 126V66Z" stroke="#C4E8A5" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Conceptual Survey Dividing Lines -->
+  <path d="M96 36V156" stroke="#0E8D60" stroke-width="6" stroke-dasharray="8 8"/>
+  <path d="M42 96H150" stroke="#0E8D60" stroke-width="6" stroke-dasharray="8 8"/>
+  
+  <!-- Golden Core Plot Identifier Marker -->
+  <circle cx="96" cy="96" r="18" fill="#D7B677" stroke="#FFFFFF" stroke-width="4"/>
+  <circle cx="96" cy="96" r="6" fill="#062B22"/>
+  
+  <!-- Botanical Sprout Leaf (Agricultural Symbol) -->
+  <path d="M96 58C96 58 116 68 116 88C104 88 96 78 96 58Z" fill="#C4E8A5"/>
+</svg>

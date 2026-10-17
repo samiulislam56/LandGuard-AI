@@ -6,6 +6,8 @@ import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
 import { MagnificationDock } from './MagnificationDock';
 import { AICopilotModal } from '../copilot/AICopilotModal';
+import { MobileBottomNav } from './MobileBottomNav';
+import { PWAInstallBanner } from '../pwa/PWAInstallBanner';
 
 export const Layout: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -43,13 +45,19 @@ export const Layout: React.FC = () => {
             isSidebarCollapsed={isSidebarCollapsed}
           />
 
-          <main className="flex-1 overflow-y-auto cadastral-grid p-3 sm:p-4 lg:p-5">
+          <main className="flex-1 overflow-y-auto cadastral-grid p-3 sm:p-4 lg:p-5 pb-20 lg:pb-5">
             <div className="w-full mx-auto">
               <Outlet />
             </div>
           </main>
         </div>
       </div>
+
+      {/* PWA Mobile App Installation Prompt */}
+      <PWAInstallBanner />
+
+      {/* Mobile Sticky Thumb Navigation */}
+      <MobileBottomNav onOpenMenu={() => setIsMobileMenuOpen(true)} />
     </div>
   );
 };

@@ -81,3 +81,38 @@
     background: rgba(37, 182, 160, 0.4);
   }
 }
+
+/* Living Land Botanical Motion Keyframes */
+@keyframes slow-drift {
+  0% {
+    transform: scale(1.0) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.04) translate(-1%, -0.5%);
+  }
+  100% {
+    transform: scale(1.02) translate(1%, 0.5%);
+  }
+}
+
+@keyframes cadastral-trace {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 120;
+  }
+}
+
+/* Accessibility: Respect user prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

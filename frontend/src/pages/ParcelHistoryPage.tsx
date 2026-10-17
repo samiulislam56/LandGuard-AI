@@ -22,6 +22,8 @@ import { CadastralMap } from '../components/gis/CadastralMap';
 import { AssetNetworkGraph } from '../components/gis/AssetNetworkGraph';
 import { Cadastral3DExplorer } from '../components/gis/Cadastral3DExplorer';
 import { generateCadastralPolygon, CadastralPlotGeo } from '../lib/geo';
+import { ParcelPassportModal } from '../components/parcel/ParcelPassportModal';
+import { TransactionComparisonStory } from '../components/parcel/TransactionComparisonStory';
 
 export const ParcelHistoryPage: React.FC = () => {
   const { id = 'LG-P-002911' } = useParams<{ id: string }>();
@@ -30,6 +32,7 @@ export const ParcelHistoryPage: React.FC = () => {
   const isBn = i18n.language === 'bn';
   const [targetId, setTargetId] = useState('');
   const [viewportMode, setViewportMode] = useState<'2d' | '3d'>('2d');
+  const [isPassportOpen, setIsPassportOpen] = useState(false);
 
   // Explicit canonical alias resolution: PARCEL-002911 -> LG-P-002911
   React.useEffect(() => {
@@ -139,6 +142,14 @@ export const ParcelHistoryPage: React.FC = () => {
               <Search className="w-3.5 h-3.5" />
             </Button>
           </form>
+
+          <Button
+            type="button"
+            onClick={() => setIsPassportOpen(true)}
+            className="h-8 px-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm"
+          >
+            <span>{isBn ? "পার্সেল পাসপোর্ট" : "Parcel Passport"}</span>
+          </Button>
         </div>
       </div>
 
@@ -423,6 +434,35 @@ export const ParcelHistoryPage: React.FC = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Side-by-Side Transaction Comparison & Guided Land Story */}
+          <TransactionComparisonStory
+            parcelId={id}
+            transactions={history.map((tx) => ({
+              transaction_id: tx.transaction_id,
+              deed_date: tx.transaction_date,
+              amount_bdt: 2500000,
+              area_acres: tx.sale_area_acres,
+              seller_id: tx.seller_alias,
+              buyer_id: tx.buyer_alias,
+              scenario: tx.scenario,
+              overlapping_claim: tx.overlapping_claim,
+            }))}
+          />
+
+          {/* Printable Synthetic Parcel Passport Modal */}
+          <ParcelPassportModal
+            isOpen={isPassportOpen}
+            onClose={() => setIsPassportOpen(false)}
+            parcel={parcel || { parcel_id: id }}
+            transactionCount={history.length}
+            lastScreeningDate="2026-10-15"
+            screeningStatus={
+              history.some((tx) => tx.scenario === 'conflicting_sale')
+                ? 'REVIEW_REQUIRED'
+                : 'VERIFIED'
+            }
+          />
         </>
       )}
     </div>

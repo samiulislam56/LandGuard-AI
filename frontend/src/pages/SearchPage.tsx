@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { LandGuardEasySearch } from '../components/search/LandGuardEasySearch';
 
 interface DivisionData {
   name_bn: string;
@@ -155,6 +156,7 @@ export const SearchPage: React.FC = () => {
   const [mouza, setMouza] = useState<string>('Aminbazar');
   const [identifier, setIdentifier] = useState<string>('');
   const [hasSearched, setHasSearched] = useState<boolean>(false);
+  const [searchMode, setSearchMode] = useState<'easy' | 'advanced'>('easy');
 
   const selectedDivisionData = GEO_HIERARCHY[division];
   const availableDistricts = selectedDivisionData?.districts || [];
@@ -197,24 +199,58 @@ export const SearchPage: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-16">
-      {/* Header */}
-      <div className="border-b border-emerald-900/10 dark:border-emerald-500/20 pb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-            {isBn ? "সহজ ভূমি তথ্য সেবা" : "Citizen Land Service"}
-          </span>
+      {/* Header & Mode Switcher */}
+      <div className="border-b border-emerald-900/10 dark:border-emerald-500/20 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+              {isBn ? "সহজ ভূমি তথ্য সেবা" : "Citizen Land Service"}
+            </span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Search className="w-7 h-7 text-emerald-700 dark:text-emerald-400" />
+            {t('search.title', 'সহজ জমি অনুসন্ধান')}
+          </h1>
+          <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 mt-1">
+            {t('search.subtitle', 'বিভাগ, জেলা ও দাগ বা খতিয়ান নম্বর নির্বাচন করে জমির তথ্য অনুসন্ধান করুন')}
+          </p>
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <Search className="w-7 h-7 text-emerald-700 dark:text-emerald-400" />
-          {t('search.title', 'সহজ জমি অনুসন্ধান')}
-        </h1>
-        <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 mt-1">
-          {t('search.subtitle', 'বিভাগ, জেলা ও দাগ বা খতিয়ান নম্বর নির্বাচন করে জমির তথ্য অনুসন্ধান করুন')}
-        </p>
+
+        {/* Mode Toggle Switcher */}
+        <div className="flex items-center bg-slate-200/80 dark:bg-slate-800 p-1 rounded-2xl border border-slate-300 dark:border-slate-700 self-start md:self-auto">
+          <button
+            type="button"
+            onClick={() => setSearchMode('easy')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+              searchMode === 'easy'
+                ? 'bg-emerald-600 text-white shadow-md'
+                : 'text-slate-700 dark:text-slate-300 hover:text-emerald-600'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>{isBn ? "সহজ মোড (৩ ধাপ)" : "Simple Mode (3 Steps)"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSearchMode('advanced')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+              searchMode === 'advanced'
+                ? 'bg-emerald-600 text-white shadow-md'
+                : 'text-slate-700 dark:text-slate-300 hover:text-emerald-600'
+            }`}
+          >
+            <span>{isBn ? "উন্নত ফিল্টার" : "Advanced Filters"}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Cascading Search Card (Reference 1 Style) */}
-      <Card className="p-6 md:p-8 bg-white dark:bg-slate-800 border-emerald-800/10 dark:border-emerald-500/20 shadow-md rounded-2xl">
+      {/* Render Easy Search Mode or Advanced Mode */}
+      {searchMode === 'easy' ? (
+        <LandGuardEasySearch onSwitchToAdvanced={() => setSearchMode('advanced')} />
+      ) : (
+        <>
+          {/* Cascading Search Card (Reference 1 Style) */}
+          <Card className="p-6 md:p-8 bg-white dark:bg-slate-800 border-emerald-800/10 dark:border-emerald-500/20 shadow-md rounded-2xl">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -425,6 +461,8 @@ export const SearchPage: React.FC = () => {
             ))}
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
