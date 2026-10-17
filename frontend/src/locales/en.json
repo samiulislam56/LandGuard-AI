@@ -138,7 +138,7 @@
   "explorer3d": {
     "title": "3D Cadastral Parcel Explorer",
     "subtitle": "Interactive Conceptual Spatial Geometry & Deed Topology",
-    "conceptualBadge": "Conceptual 3D Visualization",
+    "conceptualBadge": "Conceptual Land Map — Not an Official Survey",
     "conceptualNotice": "Elevated parcel geometries are procedural demonstrations to visualize deed relationships. They do NOT represent real ground GPS survey coordinates or official cadastral boundaries.",
     "resetCamera": "Reset Camera",
     "orbitHint": "Click & drag to rotate • Scroll to zoom • Click a parcel to inspect",

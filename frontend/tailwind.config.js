@@ -39,6 +39,17 @@ export default {
           cardDark: '#102533',
           borderLight: '#CFDEE1',
           borderDark: 'rgba(32, 199, 212, 0.22)',
+        },
+        greenfield: {
+          forest: '#062B22',
+          forestDark: '#041C16',
+          emerald: '#0E8D60',
+          emeraldLight: '#12A873',
+          leaf: '#C4E8A5',
+          gold: '#D7B677',
+          goldLight: '#E8CA94',
+          ivory: '#F5F8F2',
+          ivoryMuted: '#E5EDE0',
         }
       },
       fontFamily: {

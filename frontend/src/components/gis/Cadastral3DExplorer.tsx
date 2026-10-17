@@ -109,18 +109,18 @@ export const SAMPLE_3D_PARCELS: Parcel3DData[] = [
 // Helper to get status color in 3D
 function getParcelColor(scenario: Parcel3DData['scenario'], isHovered: boolean, isSelected: boolean): string {
   if (isSelected) return '#FFFFFF';
-  if (isHovered) return '#20C7D4'; // Bright Cyan on hover
+  if (isHovered) return '#C4E8A5'; // Greenfield Leaf
 
   switch (scenario) {
     case 'conflicting_sale':
-      return '#E46B70'; // Critical Red
+      return '#EF4444'; // Critical Conflict
     case 'area_mismatch':
     case 'owner_mismatch':
     case 'mutation_mismatch':
-      return '#E7B34B'; // Warning Amber
+      return '#D7B677'; // Greenfield Warm Gold
     case 'normal':
     default:
-      return '#24B79C'; // Signal Teal
+      return '#0E8D60'; // Greenfield Emerald
   }
 }
 
@@ -176,12 +176,12 @@ const ParcelMesh: React.FC<ParcelMeshProps> = ({
         <boxGeometry args={parcel.size} />
         <meshStandardMaterial
           color={color}
-          roughness={0.3}
-          metalness={0.2}
+          roughness={0.35}
+          metalness={0.15}
           transparent
-          opacity={isSelected ? 0.95 : isHovered ? 0.85 : 0.7}
-          emissive={isSelected ? '#20C7D4' : parcel.scenario === 'conflicting_sale' ? '#E46B70' : '#000000'}
-          emissiveIntensity={isSelected ? 0.4 : parcel.scenario === 'conflicting_sale' ? 0.2 : 0}
+          opacity={isSelected ? 0.95 : isHovered ? 0.9 : 0.8}
+          emissive={isSelected ? '#C4E8A5' : parcel.scenario === 'conflicting_sale' ? '#EF4444' : '#000000'}
+          emissiveIntensity={isSelected ? 0.4 : parcel.scenario === 'conflicting_sale' ? 0.25 : 0}
         />
       </mesh>
 
@@ -189,7 +189,7 @@ const ParcelMesh: React.FC<ParcelMeshProps> = ({
       <lineSegments>
         <edgesGeometry args={[new THREE.BoxGeometry(...parcel.size)]} />
         <lineBasicMaterial
-          color={isSelected ? '#20C7D4' : isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.5)'}
+          color={isSelected ? '#D7B677' : isDark ? '#C4E8A5' : '#0E8D60'}
           linewidth={isSelected ? 2 : 1}
         />
       </lineSegments>
@@ -199,11 +199,11 @@ const ParcelMesh: React.FC<ParcelMeshProps> = ({
         position={[0, parcel.size[1] / 2 + 0.15, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
         fontSize={0.28}
-        color={isDark ? '#F1F8FB' : '#102630'}
+        color={isDark ? '#F5F8F2' : '#062B22'}
         anchorX="center"
         anchorY="middle"
       >
-        {`Dag ${parcel.dagNo}`}
+        {`দাগ ${parcel.dagNo}`}
       </Text>
     </group>
   );
@@ -287,7 +287,7 @@ export const Cadastral3DExplorer: React.FC<Cadastral3DExplorerProps> = ({
 
   return (
     <div
-      className={`rounded-2xl border border-atlas-border bg-atlas-surface relative overflow-hidden flex flex-col shadow-atlas-lg select-none ${
+      className={`rounded-3xl border border-emerald-800/40 bg-[#062B22] relative overflow-hidden flex flex-col shadow-2xl select-none ${
         isFullscreen ? 'fixed inset-4 z-50 shadow-2xl' : ''
       } ${className}`}
       style={{ height: isFullscreen ? 'calc(100vh - 2rem)' : height }}
@@ -296,12 +296,12 @@ export const Cadastral3DExplorer: React.FC<Cadastral3DExplorerProps> = ({
       <div className="absolute top-3 left-3 right-3 z-10 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         {/* Title & Conceptual Notice Badge */}
         <div className="flex items-center gap-2 pointer-events-auto">
-          <div className="px-3 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md border border-atlas-cyan/30 text-white flex items-center gap-2 shadow-lg">
-            <Compass className="w-4 h-4 text-atlas-cyan animate-spin-slow" />
-            <span className="font-extrabold text-xs tracking-tight">
+          <div className="px-3.5 py-1.5 rounded-2xl bg-[#062B22]/90 backdrop-blur-md border border-emerald-500/30 text-white flex items-center gap-2 shadow-xl">
+            <Compass className="w-4 h-4 text-emerald-400 animate-spin-slow" />
+            <span className="font-extrabold text-xs tracking-tight text-emerald-100">
               {t('explorer3d.title')}
             </span>
-            <span className="px-2 py-0.5 rounded-md bg-atlas-cyan/20 text-atlas-cyan border border-atlas-cyan/40 text-[10px] font-mono font-bold uppercase">
+            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-[#C4E8A5] border border-emerald-500/30 text-[10px] font-mono font-bold">
               {t('explorer3d.conceptualBadge')}
             </span>
           </div>
@@ -312,49 +312,49 @@ export const Cadastral3DExplorer: React.FC<Cadastral3DExplorerProps> = ({
           <button
             type="button"
             onClick={handleResetCamera}
-            className="px-3 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md border border-atlas-cyan/30 text-white text-xs font-mono font-semibold flex items-center gap-1.5 hover:bg-slate-800 transition-colors shadow-lg"
+            className="px-3 py-1.5 rounded-2xl bg-[#062B22]/90 backdrop-blur-md border border-emerald-500/30 text-emerald-100 text-xs font-mono font-semibold flex items-center gap-1.5 hover:bg-emerald-800/60 transition-colors shadow-lg"
             title={t('explorer3d.resetCamera')}
           >
-            <RotateCcw className="w-3.5 h-3.5 text-atlas-cyan" />
+            <RotateCcw className="w-3.5 h-3.5 text-[#C4E8A5]" />
             <span className="hidden sm:inline">{t('explorer3d.resetCamera')}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className="p-2 rounded-xl bg-slate-900/90 backdrop-blur-md border border-atlas-cyan/30 text-white hover:bg-slate-800 transition-colors shadow-lg"
+            className="p-2 rounded-2xl bg-[#062B22]/90 backdrop-blur-md border border-emerald-500/30 text-emerald-100 hover:bg-emerald-800/60 transition-colors shadow-lg"
             title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
           >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            {isFullscreen ? <Minimize2 className="w-4 h-4 text-[#C4E8A5]" /> : <Maximize2 className="w-4 h-4 text-[#C4E8A5]" />}
           </button>
         </div>
       </div>
 
       {/* 3D WebGL Canvas */}
-      <div className="flex-1 w-full h-full relative bg-gradient-to-b from-[#07141E] to-[#102533]">
+      <div className="flex-1 w-full h-full relative bg-gradient-to-b from-[#062B22] to-[#031813]">
         <Canvas
           shadows
           camera={{ position: [6, 7, 8], fov: 42 }}
           onCreated={({ gl }) => {
-            gl.setClearColor(isDark ? '#07141E' : '#E9F1F3');
+            gl.setClearColor(isDark ? '#062B22' : '#F5F8F2');
           }}
           onError={() => setHasWebGlError(true)}
         >
           <Suspense fallback={null}>
             {/* Lighting */}
-            <ambientLight intensity={isDark ? 0.6 : 0.8} />
+            <ambientLight intensity={isDark ? 0.7 : 0.9} />
             <directionalLight
               position={[10, 15, 10]}
-              intensity={isDark ? 1.2 : 1.5}
+              intensity={isDark ? 1.4 : 1.6}
               castShadow
               shadow-mapSize-width={1024}
               shadow-mapSize-height={1024}
             />
-            <pointLight position={[-10, 10, -10]} intensity={0.4} />
+            <pointLight position={[-10, 10, -10]} intensity={0.5} />
 
             {/* Base Grid Plane (Ground Foundation) */}
             <gridHelper
-              args={[16, 16, isDark ? '#20C7D4' : '#087F77', isDark ? '#16313E' : '#CFDEE1']}
+              args={[16, 16, isDark ? '#0E8D60' : '#0E8D60', isDark ? '#0F3E32' : '#D9E6DF']}
               position={[0, -0.01, 0]}
             />
 
@@ -395,30 +395,30 @@ export const Cadastral3DExplorer: React.FC<Cadastral3DExplorerProps> = ({
 
       {/* Bottom Floating Legend & Interaction Hint */}
       <div className="absolute bottom-3 left-3 z-10 pointer-events-none flex flex-col gap-1.5 max-w-sm">
-        <div className="px-3 py-2 rounded-xl bg-slate-900/90 backdrop-blur-md border border-atlas-cyan/30 text-white shadow-xl pointer-events-auto">
-          <div className="flex items-center gap-2 pb-1.5 border-b border-white/10 text-[11px] font-mono font-bold text-atlas-cyan">
+        <div className="px-3.5 py-2.5 rounded-2xl bg-[#062B22]/95 backdrop-blur-md border border-emerald-500/30 text-white shadow-2xl pointer-events-auto">
+          <div className="flex items-center gap-2 pb-1.5 border-b border-emerald-800/40 text-[11px] font-mono font-bold text-[#C4E8A5]">
             <Layers className="w-3.5 h-3.5" />
             <span>{t('explorer3d.legendTitle')}</span>
           </div>
-          <div className="grid grid-cols-2 gap-2 mt-1.5 text-[10px] font-mono">
+          <div className="grid grid-cols-2 gap-2 mt-2 text-[10px] font-mono">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded bg-[#24B79C]" />
-              <span>{t('explorer3d.legendClean')}</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#0E8D60] ring-1 ring-emerald-300/40" />
+              <span className="text-emerald-100">{t('explorer3d.legendClean')}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded bg-[#E46B70]" />
-              <span>{t('explorer3d.legendConflict')}</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] ring-1 ring-red-400/40" />
+              <span className="text-emerald-100">{t('explorer3d.legendConflict')}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded bg-[#E7B34B]" />
-              <span>{t('explorer3d.legendMismatch')}</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D7B677] ring-1 ring-amber-300/40" />
+              <span className="text-emerald-100">{t('explorer3d.legendMismatch')}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded bg-[#FFFFFF] border border-cyan-400" />
-              <span>{t('explorer3d.legendSelected')}</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FFFFFF] ring-2 ring-[#C4E8A5]" />
+              <span className="text-emerald-100">{t('explorer3d.legendSelected')}</span>
             </div>
           </div>
-          <p className="text-[9px] text-slate-400 mt-2 font-mono leading-tight">
+          <p className="text-[9px] text-emerald-300/70 mt-2 font-mono leading-tight">
             {t('explorer3d.orbitHint')}
           </p>
         </div>
@@ -426,48 +426,48 @@ export const Cadastral3DExplorer: React.FC<Cadastral3DExplorerProps> = ({
 
       {/* Floating Selected Parcel Dossier (Bottom Right) */}
       {selectedParcel && (
-        <div className="absolute bottom-3 right-3 z-10 w-80 max-w-[calc(100%-1.5rem)] rounded-xl bg-slate-900/95 backdrop-blur-md border border-atlas-cyan/40 p-3.5 shadow-2xl text-slate-100 pointer-events-auto animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="flex items-start justify-between pb-2 border-b border-atlas-cyan/20">
+        <div className="absolute bottom-3 right-3 z-10 w-80 max-w-[calc(100%-1.5rem)] rounded-2xl bg-[#062B22]/95 backdrop-blur-md border border-emerald-500/40 p-4 shadow-2xl text-slate-100 pointer-events-auto animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="flex items-start justify-between pb-2 border-b border-emerald-800/40">
             <div>
-              <span className="font-mono text-xs font-bold text-atlas-cyan flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5" />
+              <span className="font-mono text-xs font-bold text-[#C4E8A5] flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 {selectedParcel.id}
               </span>
-              <p className="text-[11px] text-slate-300">
+              <p className="text-[11px] text-emerald-200/80">
                 {selectedParcel.mouza}, {selectedParcel.district}
               </p>
             </div>
             <span
-              className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase ${
+              className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase ${
                 selectedParcel.scenario === 'conflicting_sale'
                   ? 'bg-red-500/20 text-red-300 border border-red-500/40'
-                  : 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
+                  : 'bg-emerald-500/20 text-[#C4E8A5] border border-emerald-500/40'
               }`}
             >
               {selectedParcel.scenario}
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-1.5 my-2.5 text-center text-[10px] font-mono bg-slate-800/80 rounded-lg p-2">
+          <div className="grid grid-cols-3 gap-1.5 my-3 text-center text-[10px] font-mono bg-[#031813]/80 rounded-xl p-2.5 border border-emerald-900/50">
             <div>
-              <span className="text-slate-400 block">DAG</span>
+              <span className="text-emerald-400/70 block">DAG</span>
               <span className="font-bold text-white text-xs">{selectedParcel.dagNo}</span>
             </div>
             <div>
-              <span className="text-slate-400 block">KHATIAN</span>
+              <span className="text-emerald-400/70 block">KHATIAN</span>
               <span className="font-bold text-white text-xs">{selectedParcel.khatianNo}</span>
             </div>
             <div>
-              <span className="text-slate-400 block">AREA</span>
-              <span className="font-bold text-atlas-cyan text-xs">{selectedParcel.areaAcres.toFixed(2)} ac</span>
+              <span className="text-emerald-400/70 block">AREA</span>
+              <span className="font-bold text-[#D7B677] text-xs">{selectedParcel.areaAcres.toFixed(2)} ac</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-700/60">
+          <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-emerald-900/60">
             <button
               type="button"
               onClick={() => navigate(`/parcels/${selectedParcel.id}`)}
-              className="flex-1 py-1 px-2.5 rounded-lg bg-atlas-cyan/20 hover:bg-atlas-cyan text-atlas-cyan hover:text-slate-950 text-xs font-bold font-mono transition-colors text-center"
+              className="flex-1 py-1.5 px-3 rounded-xl bg-emerald-600/30 hover:bg-emerald-600 text-[#C4E8A5] hover:text-white text-xs font-bold font-mono transition-all text-center border border-emerald-500/40"
             >
               {t('explorer3d.launchDossier')}
             </button>
@@ -475,7 +475,7 @@ export const Cadastral3DExplorer: React.FC<Cadastral3DExplorerProps> = ({
               <button
                 type="button"
                 onClick={() => navigate(`/assess/${selectedParcel.associatedTxId}`)}
-                className="py-1 px-2.5 rounded-lg bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white text-xs font-bold font-mono transition-colors text-center"
+                className="py-1.5 px-3 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white text-xs font-bold font-mono transition-all text-center border border-red-500/40"
                 title="Audit Assessment"
               >
                 Audit &rarr;

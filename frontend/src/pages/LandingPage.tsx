@@ -23,6 +23,7 @@ import {
 import { api } from '../lib/api';
 import { setLanguage } from '../i18n';
 import { Button } from '../components/ui/Button';
+import { HeroLandModel3D } from '../components/gis/HeroLandModel3D';
 
 export const LandingPage: React.FC = () => {
   const { i18n } = useTranslation();
@@ -167,7 +168,7 @@ export const LandingPage: React.FC = () => {
                   <>
                     আপনার জমির তথ্য, <br />
                     <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-green-300 bg-clip-text text-transparent">
-                      আরও নিরাপদ ও সহজে
+                      আরও সহজ ও নিরাপদে
                     </span>
                   </>
                 ) : (
@@ -183,8 +184,8 @@ export const LandingPage: React.FC = () => {
               {/* Supporting Subtitle */}
               <p className="text-base sm:text-lg text-slate-300/90 max-w-2xl leading-relaxed font-normal">
                 {isBn
-                  ? "জমি ও লেনদেনের তথ্য খুঁজুন, সম্ভাব্য অসংগতি বুঝুন এবং AI-এর সহায়তায় বায়া দলিল ও নামজারি ধারাবাহিকতা নিরাপদে পর্যালোচনা করুন।"
-                  : "Search land records, identify deed and mutation anomalies, and verify chain-of-title integrity through explainable AI screening."}
+                  ? "জমি ও লেনদেনের তথ্য খুঁজুন, সম্ভাব্য অসংগতি বুঝুন এবং AI-এর সহায়তায় পর্যালোচনা করুন।"
+                  : "Search land records, identify deed and mutation anomalies, and review chain-of-title integrity with AI-powered cadastral screening."}
               </p>
 
               {/* Primary & Secondary Action Buttons */}
@@ -194,7 +195,7 @@ export const LandingPage: React.FC = () => {
                   <Button
                     variant="primary"
                     size="lg"
-                    className="gap-2 px-7 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl shadow-xl shadow-emerald-900/50 hover:shadow-2xl hover:scale-105 transition-all text-sm sm:text-base"
+                    className="gap-2 px-7 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl shadow-xl shadow-emerald-950/60 hover:shadow-2xl hover:scale-105 transition-all text-sm sm:text-base"
                   >
                     <Search className="w-5 h-5" />
                     <span>{isBn ? "জমির তথ্য খুঁজুন" : "Find Land Records"}</span>
@@ -210,7 +211,7 @@ export const LandingPage: React.FC = () => {
                   className="gap-2 px-7 py-4 border-emerald-500/40 bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-200 font-bold rounded-2xl backdrop-blur-md shadow-lg transition-all text-sm sm:text-base group"
                 >
                   <Sparkles className="w-5 h-5 text-amber-300 group-hover:rotate-12 transition-transform" />
-                  <span>{isBn ? "ডেমো ব্যবহার করুন" : "Explore Live Demo"}</span>
+                  <span>{isBn ? "লগইন ছাড়াই ডেমো দেখুন" : "Explore Demo Without Login"}</span>
                 </Button>
 
                 {/* Tertiary Link: AI Assistant */}
@@ -235,100 +236,109 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* RIGHT COLUMN: Four Sophisticated Dark Feature Cards (Image 1 Layout) */}
-            <div className="lg:col-span-5" id="features">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                
-                {/* Card 1: Digital Land Search */}
-                <Link
-                  to="/search"
-                  className="group block p-5 rounded-3xl bg-[#09221B]/90 hover:bg-[#0C2A22] border border-emerald-800/40 hover:border-emerald-500/60 shadow-xl transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-900/40 group-hover:scale-110 transition-transform mb-4">
-                    <Search className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
-                    {isBn ? "ডিজিটাল ভূমি অনুসন্ধান" : "Digital Land Search"}
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                    {isBn 
-                      ? "বিভাগ, জেলা, মৌজা, খতিয়ান ও দাগ নম্বর দিয়ে সংরক্ষিত পার্সেল খুঁজুন।" 
-                      : "Search records by Division, District, Mouza, Khatian, and Dag plot numbers."}
-                  </p>
-                  <div className="mt-4 flex items-center text-xs font-semibold text-emerald-400 group-hover:translate-x-1 transition-transform">
-                    <span>{isBn ? "অনুসন্ধান করুন" : "Search Now"}</span>
-                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </div>
-                </Link>
-
-                {/* Card 2: Digital Khasra Map */}
-                <Link
-                  to="/khasra-map"
-                  className="group block p-5 rounded-3xl bg-[#09221B]/90 hover:bg-[#0C2A22] border border-emerald-800/40 hover:border-emerald-500/60 shadow-xl transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-emerald-900/40 group-hover:scale-110 transition-transform mb-4">
-                    <Compass className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
-                    {isBn ? "ডিজিটাল খসড়া ম্যাপ" : "Digital Khasra Map"}
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                    {isBn 
-                      ? "নম্বরযুক্ত ধারণামূলক দাগের নকশা ও দ্বৈত বিক্রয়ের সীমানা নির্দেশক।" 
-                      : "Interactive cadastral plot outlines with conflicting boundary overlays."}
-                  </p>
-                  <div className="mt-4 flex items-center text-xs font-semibold text-emerald-400 group-hover:translate-x-1 transition-transform">
-                    <span>{isBn ? "ম্যাপ দেখুন" : "View Map"}</span>
-                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </div>
-                </Link>
-
-                {/* Card 3: AI Transaction Screening */}
-                <Link
-                  to="/transactions"
-                  className="group block p-5 rounded-3xl bg-[#09221B]/90 hover:bg-[#0C2A22] border border-emerald-800/40 hover:border-emerald-500/60 shadow-xl transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-900/40 group-hover:scale-110 transition-transform mb-4">
-                    <Layers className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
-                    {isBn ? "AI লেনদেন যাচাই" : "AI Transaction Screening"}
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                    {isBn 
-                      ? "র‍্যান্ডম ফরেস্ট ও আইসোলেশন ফরেস্টে দ্বৈত বিক্রয় ও নামজারি অসংগতি নির্ণয়।" 
-                      : "Machine learning anomaly detection across recorded deed history."}
-                  </p>
-                  <div className="mt-4 flex items-center text-xs font-semibold text-amber-400 group-hover:translate-x-1 transition-transform">
-                    <span>{isBn ? "যাচাই করুন" : "Screen Transactions"}</span>
-                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </div>
-                </Link>
-
-                {/* Card 4: Evidence & Review */}
-                <Link
-                  to="/reviews"
-                  className="group block p-5 rounded-3xl bg-[#09221B]/90 hover:bg-[#0C2A22] border border-emerald-800/40 hover:border-emerald-500/60 shadow-xl transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-blue-900/40 group-hover:scale-110 transition-transform mb-4">
-                    <ShieldCheck className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors">
-                    {isBn ? "প্রমাণ ও পর্যালোচনা" : "Evidence & Review"}
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                    {isBn 
-                      ? "খতিয়ান-নামজারি-দলিল (RMD) ধারাবাহিকতা ও সহকারী কমিশনার (ভূমি) অডিট।" 
-                      : "Record-Mutation-Deed triangulation audits and reviewer workspaces."}
-                  </p>
-                  <div className="mt-4 flex items-center text-xs font-semibold text-blue-400 group-hover:translate-x-1 transition-transform">
-                    <span>{isBn ? "ওয়ার্কস্পেস খুলুন" : "Open Workspace"}</span>
-                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </div>
-                </Link>
-
-              </div>
+            {/* RIGHT COLUMN: Cinematic 3D Miniature Land Model (Section 2 Signature Feature) */}
+            <div className="lg:col-span-5 relative">
+              <HeroLandModel3D />
             </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 2.1 FOUR INTERACTIVE FEATURE BLOCKS (Section 4 Requirement)              */}
+      {/* ========================================================================= */}
+      <section className="py-8 border-t border-emerald-900/40" id="features">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            
+            {/* Block 1: জমির তথ্য খুঁজুন */}
+            <Link
+              to="/search"
+              className="group block p-6 rounded-3xl bg-[#09221B]/90 hover:bg-[#0C2A22] border border-emerald-800/40 hover:border-emerald-500/60 shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-900/40 group-hover:scale-110 transition-transform mb-4">
+                <Search className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
+                {isBn ? "জমির তথ্য খুঁজুন" : "Find Land Records"}
+              </h3>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                {isBn 
+                  ? "বিভাগ, জেলা, মৌজা, খতিয়ান ও দাগ নম্বর দিয়ে দ্রুত সংরক্ষিত পার্সেল অনুসন্ধান করুন।" 
+                  : "Search records by Division, District, Mouza, Khatian, and Dag plot numbers."}
+              </p>
+              <div className="mt-4 flex items-center text-xs font-semibold text-emerald-400 group-hover:translate-x-1 transition-transform">
+                <span>{isBn ? "অনুসন্ধান শুরু করুন" : "Search Now"}</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </div>
+            </Link>
+
+            {/* Block 2: ডিজিটাল খসড়া ম্যাপ */}
+            <Link
+              to="/khasra-map"
+              className="group block p-6 rounded-3xl bg-[#09221B]/90 hover:bg-[#0C2A22] border border-emerald-800/40 hover:border-emerald-500/60 shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-emerald-900/40 group-hover:scale-110 transition-transform mb-4">
+                <Compass className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
+                {isBn ? "ডিজিটাল খসড়া ম্যাপ" : "Digital Khasra Map"}
+              </h3>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                {isBn 
+                  ? "নম্বরযুক্ত ধারণামূলক দাগের নকশা ও দ্বৈত বিক্রয়ের পার্সেল সীমানা ভিজ্যুয়ালাইজেশন।" 
+                  : "Interactive cadastral plot outlines with conflicting boundary overlays."}
+              </p>
+              <div className="mt-4 flex items-center text-xs font-semibold text-emerald-400 group-hover:translate-x-1 transition-transform">
+                <span>{isBn ? "ম্যাপ দেখুন" : "View Map"}</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </div>
+            </Link>
+
+            {/* Block 3: AI লেনদেন যাচাই */}
+            <Link
+              to="/transactions"
+              className="group block p-6 rounded-3xl bg-[#09221B]/90 hover:bg-[#0C2A22] border border-emerald-800/40 hover:border-emerald-500/60 shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-900/40 group-hover:scale-110 transition-transform mb-4">
+                <Layers className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
+                {isBn ? "AI লেনদেন যাচাই" : "AI Transaction Screening"}
+              </h3>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                {isBn 
+                  ? "র‍্যান্ডম ফরেস্ট ও আইসোলেশন ফরেস্টে দ্বৈত বিক্রয় ও নামজারি অসংগতি নির্ণয়।" 
+                  : "Machine learning anomaly detection across recorded deed history."}
+              </p>
+              <div className="mt-4 flex items-center text-xs font-semibold text-amber-400 group-hover:translate-x-1 transition-transform">
+                <span>{isBn ? "যাচাই করুন" : "Screen Transactions"}</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </div>
+            </Link>
+
+            {/* Block 4: রিভিউ ও প্রতিবেদন */}
+            <Link
+              to="/reviews"
+              className="group block p-6 rounded-3xl bg-[#09221B]/90 hover:bg-[#0C2A22] border border-emerald-800/40 hover:border-emerald-500/60 shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-blue-900/40 group-hover:scale-110 transition-transform mb-4">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors">
+                {isBn ? "রিভিউ ও প্রতিবেদন" : "Reviews & Reports"}
+              </h3>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                {isBn 
+                  ? "খতিয়ান-নামজারি-দলিল (RMD) ধারাবাহিকতা অডিট এবং অফিসিয়াল পিডিএফ ডোসিয়ার।" 
+                  : "Record-Mutation-Deed triangulation audits and official PDF dossiers."}
+              </p>
+              <div className="mt-4 flex items-center text-xs font-semibold text-blue-400 group-hover:translate-x-1 transition-transform">
+                <span>{isBn ? "প্রতিবেদন দেখুন" : "View Dossier"}</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </div>
+            </Link>
 
           </div>
         </div>
