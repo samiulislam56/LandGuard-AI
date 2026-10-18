@@ -68,7 +68,7 @@ export const PWAInstallBanner: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-16 sm:bottom-6 left-3 right-3 sm:left-auto sm:right-6 sm:max-w-md z-40 bg-[#062B22]/95 border-2 border-emerald-500/40 backdrop-blur-md p-4 rounded-3xl shadow-2xl text-white animate-in slide-in-from-bottom-4 duration-300">
+      <div className="fixed bottom-[calc(9.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-24 right-3 sm:right-6 w-[calc(100vw-24px)] max-w-[360px] sm:max-w-md z-[60] bg-[#062B22]/95 border-2 border-emerald-500/40 backdrop-blur-md p-3.5 sm:p-4 rounded-3xl shadow-2xl text-white animate-in slide-in-from-bottom-4 duration-300 pointer-events-auto">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-600/30 border border-emerald-500/40 flex items-center justify-center text-[#C4E8A5] shrink-0">
@@ -120,7 +120,7 @@ export const PWAInstallBanner: React.FC = () => {
 
       {/* iOS Safari Manual Instructions Modal */}
       {showIOSGuide && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
           <div className="bg-[#062B22] border-2 border-emerald-600/40 p-6 rounded-3xl max-w-sm w-full shadow-2xl text-white space-y-4">
             <div className="flex items-center justify-between border-b border-emerald-800/40 pb-3">
               <h3 className="font-bold text-base flex items-center gap-2">

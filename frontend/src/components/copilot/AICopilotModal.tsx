@@ -522,19 +522,21 @@ export const AICopilotModal: React.FC = () => {
   return (
     <>
       {/* Floating Launcher Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Open AI Copilot"
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#047857] hover:bg-[#035e44] text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 border border-emerald-500/40 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 min-h-[48px]"
-      >
-        <div className="relative">
-          <Bot className="w-5 h-5 text-emerald-100" />
-          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full animate-pulse" />
-        </div>
-        <span className="font-bold text-sm">
-          {isBn ? "AI ভূমি সহকারী" : "AI Copilot"}
-        </span>
-      </button>
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          aria-label="Open AI Copilot"
+          className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 right-3.5 sm:right-6 z-50 flex items-center gap-2 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full bg-[#047857] hover:bg-[#035e44] text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 border border-emerald-500/40 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 min-h-[44px] sm:min-h-[48px]"
+        >
+          <div className="relative">
+            <Bot className="w-5 h-5 text-emerald-100" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full animate-pulse" />
+          </div>
+          <span className="font-bold text-xs sm:text-sm">
+            {isBn ? "AI ভূমি সহকারী" : "AI Copilot"}
+          </span>
+        </button>
+      )}
 
       {/* Slide-over Copilot Panel */}
       {isOpen && (
@@ -542,7 +544,7 @@ export const AICopilotModal: React.FC = () => {
           role="dialog" 
           aria-modal="true"
           aria-label={isBn ? "স্মার্ট ভূমি সহকারী" : "AI Land Assistant"}
-          className="fixed inset-y-0 right-0 z-50 w-full sm:w-[460px] bg-white dark:bg-[#1E293B] shadow-2xl border-l border-[#D2E2D9] dark:border-[#526579] flex flex-col transition-all duration-300 animate-in slide-in-from-right"
+          className="fixed inset-y-0 right-0 z-[70] w-full sm:w-[460px] bg-white dark:bg-[#1E293B] shadow-2xl border-l border-[#D2E2D9] dark:border-[#526579] flex flex-col transition-all duration-300 animate-in slide-in-from-right"
         >
           {/* Header */}
           <div className="p-4 bg-gradient-to-r from-emerald-800 to-emerald-950 text-white flex items-center justify-between border-b border-emerald-700/60 shadow-md">

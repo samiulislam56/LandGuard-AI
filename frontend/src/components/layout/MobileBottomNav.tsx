@@ -47,7 +47,7 @@ export const MobileBottomNav: React.FC<Props> = ({ onOpenMenu }) => {
   return (
     <nav 
       aria-label="Mobile Navigation"
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#062B22]/95 backdrop-blur-lg border-t border-emerald-800/40 px-2 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.3)]"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#062B22]/95 backdrop-blur-lg border-t border-emerald-800/40 px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))] shadow-[0_-4px_20px_rgba(0,0,0,0.3)]"
     >
       <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {
