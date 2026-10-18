@@ -237,7 +237,7 @@
   },
   "copilot": {
     "title": "AI Land Assistant — Copilot",
-    "greeting": "Hello! I am LandGuard AI Assistant. Ask me anything about Khatian, Dag numbers, Mutation, or transaction screening results.",
+    "greeting": "Assalamu Alaikum! Welcome to LandGuard AI. I can help you explore sample land records, understand transaction screening results, and learn what to do next.",
     "placeholder": "Type your question (e.g., What does Review Required mean?)...",
     "disclaimer": "Answers are generated based on synthetic land records and general cadastral guidelines. Not legal advice."
   },
