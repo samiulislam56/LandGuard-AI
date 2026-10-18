@@ -34,7 +34,7 @@ LandGuard AI is an approachable, inclusive, yet analytically rigorous land infor
 
 | Service | Platform | Environment | Live URL |
 | :--- | :--- | :--- | :--- |
-| **Frontend Web App** | Vercel | Production | [https://land-guard-ai.vercel.app](https://land-guard-ai.vercel.app) |
+| **Frontend Web App** | Vercel | Production | [https://land-guard-ai.vercel.app](https://land-guard-ai-ten.vercel.app/) |
 | **Backend REST API** | Render | Production | [https://landguard-ai-backend-y2q3.onrender.com](https://landguard-ai-backend-y2q3.onrender.com) |
 | **API Health Telemetry** | Render | Production | [https://landguard-ai-backend-y2q3.onrender.com/health](https://landguard-ai-backend-y2q3.onrender.com/health) |
 | **Interactive API Docs** | Render | Production | [https://landguard-ai-backend-y2q3.onrender.com/docs](https://landguard-ai-backend-y2q3.onrender.com/docs) |
