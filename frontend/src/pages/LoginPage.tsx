@@ -18,7 +18,7 @@ import {
   Home,
   Languages
 } from 'lucide-react';
-import { api } from '../lib/api';
+import { api, authStorage } from '../lib/api';
 import { Button } from '../components/ui/Button';
 import { setLanguage } from '../i18n';
 
@@ -53,22 +53,8 @@ export const LoginPage: React.FC = () => {
     setLanguage(isBn ? 'en' : 'bn');
   };
 
-  // 1-Click Direct Demo Mutation (Problem 2)
-  const demoMutation = useMutation({
-    mutationFn: () => api.demoLogin(),
-    onSuccess: () => {
-      localStorage.setItem('landguard_has_entered', 'true');
-      queryClient.invalidateQueries({ queryKey: ['authMe'] });
-      setSuccessMsg(isBn ? 'লগইন ছাড়াই ডেমো মোডে প্রবেশ করছেন...' : 'Entering Demo Mode without login...');
-      setTimeout(() => {
-        navigate('/home');
-      }, 500);
-    },
-    onError: () => {
-      localStorage.setItem('landguard_has_entered', 'true');
-      navigate('/home');
-    }
-  });
+  // Immediate Direct Demo Access State
+  const [isNavigatingDemo, setIsNavigatingDemo] = useState(false);
 
   // Public User Registration Mutation (Problem 1)
   const registerMutation = useMutation({
@@ -145,7 +131,30 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleDirectDemoAccess = () => {
-    demoMutation.mutate();
+    if (isNavigatingDemo) return;
+    setIsNavigatingDemo(true);
+
+    // 1. Instantly register guest entry and establish local guest session
+    try {
+      localStorage.setItem('landguard_has_entered', 'true');
+      if (!authStorage.getToken()) {
+        authStorage.setToken('demo_guest_token_' + Date.now());
+      }
+    } catch {
+      // storage unavailable
+    }
+
+    // 2. Immediate route navigation to public demo dashboard (<50ms)
+    navigate('/home');
+
+    // 3. Asynchronously synchronize server demo session without blocking UI
+    api.demoLogin()
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: ['authMe'] });
+      })
+      .catch(() => {
+        // Safe to ignore: guest read-only access operates smoothly offline or during cold boot
+      });
   };
 
   return (
@@ -417,7 +426,7 @@ export const LoginPage: React.FC = () => {
                 variant="primary"
                 className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md flex items-center justify-center gap-2 group transition-all"
                 onClick={handleDirectDemoAccess}
-                isLoading={demoMutation.isPending}
+                disabled={isNavigatingDemo}
               >
                 <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
                 <span>

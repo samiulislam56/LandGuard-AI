@@ -65,9 +65,19 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const token = authStorage.getToken();
   const authHeaders: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
 
+  // Safeguard against hung promises with configurable timeout (default 25s)
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  let signal = options.signal;
+  if (!signal && typeof AbortController !== 'undefined') {
+    const controller = new AbortController();
+    signal = controller.signal;
+    timeoutId = setTimeout(() => controller.abort(), 25000);
+  }
+
   try {
     const res = await fetch(url, {
       ...options,
+      signal,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -102,6 +112,10 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       0,
       message
     );
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
   }
 }
 

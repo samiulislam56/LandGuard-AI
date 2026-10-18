@@ -28,7 +28,6 @@ import {
 import { api } from '../lib/api';
 import { Button } from '../components/ui/Button';
 import { Skeleton } from '../components/ui/Skeleton';
-import { ErrorState } from '../components/ui/ErrorState';
 import { CadastralMap } from '../components/gis/CadastralMap';
 import { Cadastral3DExplorer } from '../components/gis/Cadastral3DExplorer';
 import { AssetNetworkGraph } from '../components/gis/AssetNetworkGraph';
@@ -60,7 +59,6 @@ export const DashboardPage: React.FC = () => {
     data: summary,
     isLoading: isSummaryLoading,
     isError: isSummaryError,
-    error: summaryError,
     refetch: refetchSummary,
   } = useQuery({
     queryKey: ['dashboardSummary'],
@@ -183,19 +181,6 @@ export const DashboardPage: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  if (isSummaryError) {
-    return (
-      <ErrorState
-        title="Failed to Connect to LandGuard Backend"
-        message={
-          summaryError instanceof Error
-            ? summaryError.message
-            : 'FastAPI backend connection failure. Ensure uvicorn is running on http://127.0.0.1:8000.'
-        }
-        onRetry={() => refetchSummary()}
-      />
-    );
-  }
 
   return (
     <div className="space-y-4 pb-8 select-none">
@@ -568,6 +553,31 @@ export const DashboardPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Real-time Data Loading & Cold Start Notifications */}
+      {isSummaryLoading && (
+        <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs font-semibold animate-pulse">
+          <div className="w-3.5 h-3.5 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin shrink-0" />
+          <span>{isBn ? "তথ্য লোড হচ্ছে, অনুগ্রহ করে একটু অপেক্ষা করুন।" : "Loading data, please wait a moment..."}</span>
+        </div>
+      )}
+
+      {isSummaryError && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 px-4 py-2.5 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+          <div className="flex items-center gap-2">
+            <AlertOctagon className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>{isBn ? "সার্ভারের সঙ্গে সংযোগে দেরি হচ্ছে। আবার চেষ্টা করুন।" : "Delayed connection to server. Please try again."}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => refetchSummary()}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm transition-all shrink-0 self-start sm:self-auto"
+          >
+            <RotateCcw className="w-3 h-3" />
+            <span>{isBn ? "আবার চেষ্টা করুন" : "Retry"}</span>
+          </button>
+        </div>
+      )}
 
       {/* =========================================================================
           SECTION 3: REAL DASHBOARD KPI METRICS STRIP (Zone 3 - Bottom / Floating)

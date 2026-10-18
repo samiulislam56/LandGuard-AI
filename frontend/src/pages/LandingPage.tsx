@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Leaf,
   Search,
@@ -20,7 +20,7 @@ import {
   MapPin
 } from 'lucide-react';
 
-import { api } from '../lib/api';
+import { api, authStorage } from '../lib/api';
 import { setLanguage } from '../i18n';
 import { Button } from '../components/ui/Button';
 import { HeroLandModel3D } from '../components/gis/HeroLandModel3D';
@@ -35,22 +35,31 @@ export const LandingPage: React.FC = () => {
     setLanguage(isBn ? 'en' : 'bn');
   };
 
-  // One-click demo login mutation
-  const demoMutation = useMutation({
-    mutationFn: () => api.demoLogin(),
-    onSuccess: () => {
-      localStorage.setItem('landguard_has_entered', 'true');
-      queryClient.invalidateQueries({ queryKey: ['authMe'] });
-      navigate('/home');
-    },
-    onError: () => {
-      localStorage.setItem('landguard_has_entered', 'true');
-      navigate('/home');
-    }
-  });
+  // Immediate Direct Demo Access State
+  const [isNavigatingDemo, setIsNavigatingDemo] = useState(false);
 
   const handleDemoAccess = () => {
-    demoMutation.mutate();
+    if (isNavigatingDemo) return;
+    setIsNavigatingDemo(true);
+
+    try {
+      localStorage.setItem('landguard_has_entered', 'true');
+      if (!authStorage.getToken()) {
+        authStorage.setToken('demo_guest_token_' + Date.now());
+      }
+    } catch {
+      // storage unavailable
+    }
+
+    navigate('/home');
+
+    api.demoLogin()
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: ['authMe'] });
+      })
+      .catch(() => {
+        // Safe to ignore: guest read-only access operates smoothly offline or during cold boot
+      });
   };
 
   return (
@@ -132,8 +141,8 @@ export const LandingPage: React.FC = () => {
             {/* One-Click Demo Header Button */}
             <button
               onClick={handleDemoAccess}
-              disabled={demoMutation.isPending}
-              className="hidden lg:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-400/40 text-emerald-300 text-xs font-bold transition-all shadow-sm"
+              disabled={isNavigatingDemo}
+              className="hidden lg:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-400/40 text-emerald-300 text-xs font-bold transition-all shadow-sm disabled:opacity-50"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
               <span>{isBn ? "ডেমো দেখুন" : "Demo Access"}</span>
@@ -207,7 +216,7 @@ export const LandingPage: React.FC = () => {
                   variant="outline"
                   size="lg"
                   onClick={handleDemoAccess}
-                  isLoading={demoMutation.isPending}
+                  disabled={isNavigatingDemo}
                   className="gap-2 px-7 py-4 border-emerald-500/40 bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-200 font-bold rounded-2xl backdrop-blur-md shadow-lg transition-all text-sm sm:text-base group"
                 >
                   <Sparkles className="w-5 h-5 text-amber-300 group-hover:rotate-12 transition-transform" />
@@ -430,7 +439,8 @@ export const LandingPage: React.FC = () => {
 
                 <button
                   onClick={handleDemoAccess}
-                  className="px-5 py-2.5 rounded-xl border border-emerald-500/50 text-emerald-300 font-semibold text-xs hover:bg-emerald-900/40 backdrop-blur-md transition-all"
+                  disabled={isNavigatingDemo}
+                  className="px-5 py-2.5 rounded-xl border border-emerald-500/50 text-emerald-300 font-semibold text-xs hover:bg-emerald-900/40 backdrop-blur-md transition-all disabled:opacity-50"
                 >
                   {isBn ? "লগইন ছাড়াই ডেমো দেখুন" : "Explore Demo Without Login"}
                 </button>
